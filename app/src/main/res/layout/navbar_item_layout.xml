@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/ivNavBarItemIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/lightPrimary"
+        android:src="@drawable/com_facebook_button_icon"
+        />
+
+
+    <TextView
+        android:id="@+id/tvNavBarItemTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:gravity="center_vertical"
+        android:textColor="@color/darkPrimary"
+        android:text="Line 1"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/ivNavBarItemIcon"
+        android:layout_toEndOf="@+id/ivNavBarItemIcon" />
+
+    <TextView android:id="@+id/tvNavBarItemDesc"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="@color/secondText"
+              android:text="Line 2"
+              android:layout_toRightOf="@+id/ivNavBarItemIcon"
+              android:layout_below="@+id/tvNavBarItemTitle"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
