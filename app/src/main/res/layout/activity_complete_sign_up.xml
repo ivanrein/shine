@@ -7,14 +7,17 @@
     android:orientation="vertical"
     tools:context="com.shineapptpa.rei.shine.CompleteSignUpActivity">
 
-    <EditText android:hint="Full Name" android:layout_width="200dp"
-        android:layout_height="wrap_content" android:id="@+id/full_name"/>
 
     <EditText
         android:layout_width="200dp"
-        android:layout_height="wrap_content" android:id="@+id/password"
+        android:layout_height="wrap_content" android:id="@+id/password_or_fullname"
         android:hint="Password" android:inputType="textPassword"/>
-
+    <EditText
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:hint="A little about yourself"
+        android:gravity="top|left"
+        android:id="@+id/bio"/>
     <TextView
         android:layout_width="200dp"
         android:layout_height="wrap_content" android:text="Choose your school"/>

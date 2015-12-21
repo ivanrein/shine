@@ -1,8 +1,10 @@
 package com.shineapptpa.rei.shine;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -19,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.login.LoginManager;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -36,39 +40,76 @@ public class CompleteSignUpActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     ArrayList<String> schools;
     Button completeRegistrationBtn;
+    EditText mFullNameOrPwd;
+    EditText mBio;
     RequestQueue mRequestQue;
     Spinner mSchoolSpinner;
-    String userEmail;
-    String userFullName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_sign_up);
-        userEmail = getIntent().getStringExtra(MainActivity.USER_EMAIL);
+
         mSchoolSpinner = (Spinner)findViewById(R.id.schools);
+        mBio = (EditText)findViewById(R.id.bio);
         schools = new ArrayList<>();
         completeRegistrationBtn = (Button)findViewById(R.id.submit_btn);
+        final boolean formWithPassword = getIntent().getIntExtra(MainActivity.FORM_CODE,
+                MainActivity.FORM_WITHOUT_PASSWORD) == MainActivity.FORM_WITH_PASSWORD;
+        mFullNameOrPwd = (EditText)findViewById(R.id.password_or_fullname);
+        if(!formWithPassword){
+            mFullNameOrPwd.setHint("Full Name");
+            mFullNameOrPwd.setInputType(InputType.TYPE_CLASS_TEXT);
+        }
 
         completeRegistrationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getIntent().getIntExtra(MainActivity.FORM_CODE,
-                        MainActivity.FORM_WITHOUT_PASSWORD) == MainActivity.FORM_WITH_PASSWORD){
-                    userEmail = getIntent().getStringExtra(MainActivity.USER_EMAIL);
-                    userFullName = getIntent().getStringExtra(MainActivity.USER_FULLNAME);
+                //FORM WITH PASSWORD means the user sign up with FACEBOOK. This means
+                // WE GOT NAME AND EMAIL, BUT NOT PASSWORD. SO WE HAVE TO PROVIDE FORM FOR PASSWORD.
 
+                String userFullName;
+                String userPassword;
+                String bio = mBio.getText().toString();
+                String userEmail = getIntent().getStringExtra(MainActivity.USER_EMAIL);
+                if(formWithPassword){
+
+                    userFullName = getIntent().getStringExtra(MainActivity.USER_FULLNAME);
+                    userPassword = mFullNameOrPwd.getText().toString();
                     ParseUser user = new ParseUser();
                     user.setUsername(userEmail);
-                    user.setPassword(userFullName);
-
-                    //sign up the user. this also log the user in.
+                    user.setPassword(userPassword);
+                    user.put("name", userFullName);
+                    user.put("bio", bio);
+                    //sign up the user in PARSE. this also log the user in (on parse backend)
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {
                                 //success sign up
-                                Log.d("username", ParseUser.getCurrentUser().getUsername());
+                                Log.d("signup", "berhasil");
                             } else {
                                 //failed sign up
+                            }
+                        }
+                    });
+                }else{
+                    //ELSE, the user SIGN UP WITH PARSE. THIS MEANS WE GOT EMAIL AND PASSWORD, BUT NOT NAME. WE PROVIDE FORM FOR FULLNAME, BUT NOT PASSWORD.
+
+                    userFullName = mFullNameOrPwd.getText().toString();
+                    userPassword = getIntent().getStringExtra(MainActivity.USER_PASSWORD);
+                    ParseUser user = new ParseUser();
+                    user.setUsername(userEmail);
+                    user.setPassword(userPassword);
+                    user.put("name", userFullName);
+                    user.put("bio", bio);
+
+                    user.signUpInBackground(new SignUpCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                Log.d("signup", "berhasil");
+                            }else{
+
                             }
                         }
                     });
@@ -99,6 +140,12 @@ public class CompleteSignUpActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LoginManager.getInstance().logOut();
     }
 
     private void fetchSchool() {

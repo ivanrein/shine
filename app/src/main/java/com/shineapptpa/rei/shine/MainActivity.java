@@ -30,6 +30,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.parse.FindCallback;
@@ -64,8 +65,9 @@ public class MainActivity extends AppCompatActivity {
     public final static int FORM_WITHOUT_PASSWORD = 2;
     public final static String USER_EMAIL = "user_email";
     public final static String USER_FULLNAME = "user_fullname";
+    public final static String USER_PASSWORD = "user_password";
 
-    // object which methods are called after success, failed, or cancelled facebook login attempt
+    // FUNGSI DIPANGGIL ABIS FB LOGIN
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(final LoginResult loginResult) {
@@ -152,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
         email = (EditText)findViewById(R.id.email);
         pwd = (EditText)findViewById(R.id.pwd);
 
+        // LOGIN PAKE PARSE
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     public void done(ParseUser user, ParseException e) {
 
                         if (user != null) {
-                            //success login
+                            //success login, lanjut ke home activity
                             Log.d("user", ParseUser.getCurrentUser().getUsername());
                         } else {
 
@@ -176,22 +179,12 @@ public class MainActivity extends AppCompatActivity {
         mRegis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //creating a new user
-                ParseUser user = new ParseUser();
-                user.setUsername(email.getText().toString());
-                user.setPassword(pwd.getText().toString());
-
-                //sign up the user. this also log the user in.
-                user.signUpInBackground(new SignUpCallback() {
-                    public void done(ParseException e) {
-                        if (e == null) {
-                            //success sign up
-                            Log.d("username", ParseUser.getCurrentUser().getUsername());
-                        } else {
-                            //failed sign up
-                        }
-                    }
-                });
+                // lanjut ke complete registration.
+                Intent i = new Intent(getApplicationContext(),CompleteSignUpActivity.class);
+                i.putExtra(FORM_CODE, FORM_WITHOUT_PASSWORD);
+                i.putExtra(USER_EMAIL, email.getText().toString());
+                i.putExtra(USER_PASSWORD, pwd.getText().toString());
+                startActivity(i);
             }
         });
 
@@ -234,17 +227,20 @@ public class MainActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> objects, ParseException e) {
                 if (e == null) {
-
+                    // ga ada error
                     if(objects.size() <= 0){
-
+                        //user login pake fb, tapi email ga ada di database PARSE, lanjut complete registration
                         Intent i = new Intent(getApplicationContext(), CompleteSignUpActivity.class);
                         i.putExtra(FORM_CODE, FORM_WITH_PASSWORD);
                         i.putExtra(USER_EMAIL, email);
                         i.putExtra(USER_FULLNAME, fullname);
                         startActivity(i);
+                    }else if(objects.size() > 0){
+                        //user login pake fb, email udah ada di Parse, berarti data lengkap,
+                        // login'in juga pake PARSE, terus masuk ke HomeActivity,
                     }
                 } else {
-
+                    // ada error
                 }
             }
         });
