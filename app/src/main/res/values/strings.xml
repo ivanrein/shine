@@ -6,4 +6,10 @@
     <string name="facebook_app_id">943213372428997</string>
     <string name="title_activity_complete_sign_up">CompleteSignUpActivity</string>
     <string name="laravel_API_url">http://10.0.2.2:1510/tpa/public/</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navbar_open">open_navbar</string>
+    <string name="navbar_close">close_navbar</string>
+    <string name="txt_guest">Guest</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
