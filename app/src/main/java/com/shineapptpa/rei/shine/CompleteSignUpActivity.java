@@ -86,7 +86,8 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                         public void done(ParseException e) {
                             if (e == null) {
                                 //success sign up
-                                Log.d("signup", "berhasil");
+                                Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                                startActivity(i);
                             } else {
                                 //failed sign up
                             }
@@ -107,7 +108,9 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                         @Override
                         public void done(ParseException e) {
                             if(e == null){
-                                Log.d("signup", "berhasil");
+
+                                Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                                startActivity(i);
                             }else{
 
                             }

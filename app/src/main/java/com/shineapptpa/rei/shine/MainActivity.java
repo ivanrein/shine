@@ -166,7 +166,8 @@ public class MainActivity extends AppCompatActivity {
 
                         if (user != null) {
                             //success login, lanjut ke home activity
-                            Log.d("user", ParseUser.getCurrentUser().getUsername());
+                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                            startActivity(i);
                         } else {
 
                         }
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                     }else if(objects.size() > 0){
                         //user login pake fb, email udah ada di Parse, berarti data lengkap,
                         // login'in juga pake PARSE, terus masuk ke HomeActivity,
+
                     }
                 } else {
                     // ada error
