@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -44,11 +45,16 @@ public class CompleteSignUpActivity extends AppCompatActivity {
     EditText mBio;
     RequestQueue mRequestQue;
     Spinner mSchoolSpinner;
+    RadioButton male;
+    RadioButton female;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_sign_up);
+        setResult(RESULT_CANCELED);
+        male = (RadioButton)findViewById(R.id.radMale);
+        female = (RadioButton)findViewById(R.id.radFemale);
 
         mSchoolSpinner = (Spinner)findViewById(R.id.schools);
         mBio = (EditText)findViewById(R.id.bio);
@@ -67,11 +73,15 @@ public class CompleteSignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //FORM WITH PASSWORD means the user sign up with FACEBOOK. This means
                 // WE GOT NAME AND EMAIL, BUT NOT PASSWORD. SO WE HAVE TO PROVIDE FORM FOR PASSWORD.
-
+                String gender;
                 String userFullName;
                 String userPassword;
                 String bio = mBio.getText().toString();
                 String userEmail = getIntent().getStringExtra(MainActivity.USER_EMAIL);
+
+                if(male.isChecked()) gender = "male";
+                else gender = "female";
+
                 if(formWithPassword){
 
                     userFullName = getIntent().getStringExtra(MainActivity.USER_FULLNAME);
@@ -81,13 +91,16 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                     user.setPassword(userPassword);
                     user.put("name", userFullName);
                     user.put("bio", bio);
+                    user.put("gender", gender);
+                    user.put("school", mSchoolSpinner.getSelectedItem().toString());
                     //sign up the user in PARSE. this also log the user in (on parse backend)
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {
                                 //success sign up
-                                Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                                startActivity(i);
+
+                                setResult(RESULT_OK);
+                                finish();
                             } else {
                                 //failed sign up
                             }
@@ -103,14 +116,16 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                     user.setPassword(userPassword);
                     user.put("name", userFullName);
                     user.put("bio", bio);
-
+                    user.put("gender", gender);
+                    user.put("school", mSchoolSpinner.getSelectedItem().toString());
                     user.signUpInBackground(new SignUpCallback() {
                         @Override
                         public void done(ParseException e) {
                             if(e == null){
 
-                                Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                                startActivity(i);
+
+                                setResult(RESULT_OK);
+                                finish();
                             }else{
 
                             }

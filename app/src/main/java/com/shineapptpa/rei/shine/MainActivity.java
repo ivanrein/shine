@@ -1,6 +1,7 @@
 package com.shineapptpa.rei.shine;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String USER_EMAIL = "user_email";
     public final static String USER_FULLNAME = "user_fullname";
     public final static String USER_PASSWORD = "user_password";
-
+    public final static int REQUEST_COMPLETE_REGISTRATION = 9;
     // FUNGSI DIPANGGIL ABIS FB LOGIN
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override
@@ -154,6 +155,13 @@ public class MainActivity extends AppCompatActivity {
         email = (EditText)findViewById(R.id.email);
         pwd = (EditText)findViewById(R.id.pwd);
 
+
+        if(ParseUser.getCurrentUser() != null){
+            Log.d("user not null", "start new acti");
+            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+            startActivity(i);
+            //ParseUser.logOut();
+        }
         // LOGIN PAKE PARSE
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +174,11 @@ public class MainActivity extends AppCompatActivity {
 
                         if (user != null) {
                             //success login, lanjut ke home activity
+
+                            ShineUser.setCurrentUser(ParseUser.getCurrentUser().get("username").toString(),
+                                    ParseUser.getCurrentUser().get("school").toString(),
+                                    ParseUser.getCurrentUser().get("gender").toString(),
+                                    ParseUser.getCurrentUser().get("name").toString());
                             Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                             startActivity(i);
                         } else {
@@ -219,32 +232,53 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_COMPLETE_REGISTRATION){
+            if(resultCode == Activity.RESULT_OK){
+                Log.d("logout", "logout result ok");
+                Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(i);
+            }else{
+                Log.d("logout", "logout result cancelled");
+                LoginManager.getInstance().logOut();
+
+            }
+        }
     }
 
     // if a user logged in with facebook, check if user exist in Parse database
     private void syncParseUser(final String email, final String fullname){
         ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("email", email);
+        query.whereEqualTo("username", email);
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> objects, ParseException e) {
                 if (e == null) {
                     // ga ada error
                     if(objects.size() <= 0){
                         //user login pake fb, tapi email ga ada di database PARSE, lanjut complete registration
+                        Log.d("fb login", "daftar baru");
                         Intent i = new Intent(getApplicationContext(), CompleteSignUpActivity.class);
                         i.putExtra(FORM_CODE, FORM_WITH_PASSWORD);
                         i.putExtra(USER_EMAIL, email);
                         i.putExtra(USER_FULLNAME, fullname);
-                        startActivity(i);
+                        startActivityForResult(i, REQUEST_COMPLETE_REGISTRATION);
                     }else if(objects.size() > 0){
                         //user login pake fb, email udah ada di Parse, berarti data lengkap,
                         // login'in juga pake PARSE, terus masuk ke HomeActivity,
-
+                        Log.d("fb login", "login");
+                        ShineUser.setCurrentUser(objects.get(0).get("username").toString(),
+                                objects.get(0).get("school").toString(),
+                                objects.get(0).get("gender").toString(),
+                                objects.get(0).get("name").toString());
+                        Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                        startActivity(i);
                     }
                 } else {
                     // ada error
+                    Log.d("fb login", e.getMessage());
                 }
             }
         });
     }
+
+
 }
