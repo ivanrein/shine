@@ -1,6 +1,8 @@
 package com.shineapptpa.rei.shine;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.PersistableBundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -12,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -19,13 +22,15 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     public static ListView mNavbarList;
     private RelativeLayout mNavbarPanel;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private DrawerLayout mNavbarLayout;
-    private TextView mTextViewUsername;
+    private ImageView mImageViewProfpic;
+    private TextView mTextViewUsername, mTextViewSchool;
+    private RelativeLayout mRelativeLayoutUserInfo;
     private ArrayList<NavItem> mNavbarItems = new ArrayList<NavItem>();
 
 
@@ -33,17 +38,34 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
-        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayShowTitleEnabled(true);
-
+        setToolbar();
         initializeNavbar();
+
+        setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
+    }
+
+    private void setUser(String name, String school, int profilePicture)
+    {
+        mTextViewUsername.setText(name);
+        mTextViewSchool.setText(school);
+        mImageViewProfpic.setImageResource(profilePicture);
     }
 
     private void initializeNavbar()
     {
         mTextViewUsername = (TextView) findViewById(R.id.tvUsername);
+        mTextViewSchool = (TextView) findViewById(R.id.tvSchool);
+        mImageViewProfpic = (ImageView) findViewById(R.id.avatar);
+        mRelativeLayoutUserInfo = (RelativeLayout) findViewById(R.id.userinfo);
+
+        mRelativeLayoutUserInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = MyProfileActivity.newIntent(HomeActivity.this);
+                startActivity(intent);
+            }
+        });
+
 
         mNavbarLayout  = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavbarList = (ListView) findViewById(R.id.lvNavBar);
@@ -77,6 +99,7 @@ public class HomeActivity extends AppCompatActivity {
         mNavbarItems.add(new NavItem("Coba2", "descccss", R.drawable.com_facebook_button_icon));
         mNavbarItems.add(new NavItem("Coba3", "descccww", R.drawable.com_facebook_button_icon));
         mTextViewUsername.setText("Guest");
+        mTextViewUsername.setText("Binus University");
 
         mNavbarLayout.setDrawerListener(mActionBarDrawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
