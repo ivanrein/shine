@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -34,13 +35,10 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,8 +46,8 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,7 +78,10 @@ public class MainActivity extends AppCompatActivity {
                 protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
                     AccessToken acsToken = loginResult.getAccessToken();
                     profile = newProfile;
-                    Log.d("profilechanged", profile.getFirstName());
+                    Log.d("profilechanged", acsToken.getApplicationId());
+                    Log.d("profilechanged", acsToken.getPermissions().toString());
+                    Log.d("profilechanged", acsToken.getToken());
+                    Log.d("profilechanged", acsToken.getUserId());
 
                     GraphRequest request = GraphRequest.newMeRequest(
                             loginResult.getAccessToken(),
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     try {
                                         Log.d("asd", jsonObject.getString("email"));
-                                        syncParseUser(jsonObject.getString("email"), profile.getName());
+                                        syncLaravelUser(jsonObject.getString("email"), profile.getName());
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -246,38 +247,90 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // if a user logged in with facebook, check if user exist in Parse database
-    private void syncParseUser(final String email, final String fullname){
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereEqualTo("username", email);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            public void done(List<ParseUser> objects, ParseException e) {
-                if (e == null) {
-                    // ga ada error
-                    if(objects.size() <= 0){
-                        //user login pake fb, tapi email ga ada di database PARSE, lanjut complete registration
-                        Log.d("fb login", "daftar baru");
-                        Intent i = new Intent(getApplicationContext(), CompleteSignUpActivity.class);
-                        i.putExtra(FORM_CODE, FORM_WITH_PASSWORD);
-                        i.putExtra(USER_EMAIL, email);
-                        i.putExtra(USER_FULLNAME, fullname);
-                        startActivityForResult(i, REQUEST_COMPLETE_REGISTRATION);
-                    }else if(objects.size() > 0){
-                        //user login pake fb, email udah ada di Parse, berarti data lengkap,
-                        // login'in juga pake PARSE, terus masuk ke HomeActivity,
-                        Log.d("fb login", "login");
-                        ShineUser.setCurrentUser(objects.get(0).get("username").toString(),
-                                objects.get(0).get("school").toString(),
-                                objects.get(0).get("gender").toString(),
-                                objects.get(0).get("name").toString());
-                        Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                        startActivity(i);
+    private void syncLaravelUser(final String email, final String fullname){
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        final HashMap<String, String> userInformation = new HashMap<String, String>(6);
+        userInformation.put("email", email);
+        JSONObject jsonInfo = new JSONObject(userInformation);
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET,
+                getString(R.string.laravel_API_url) + "CheckUser", jsonInfo,
+                new Response.Listener<JSONObject>() {
+
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            String user= response.getString("user");
+                            if(user != "null") {
+                                Log.d("sync laravel user", "getting acces token after fb login");
+                                getAccessTokenAfterFacebookLogin(email);
+
+                            }else{
+                                Log.d("sync laravel user", "go to complete form");
+                                Intent i = new Intent(getApplicationContext(), CompleteSignUpActivity.class);
+                                i.putExtra(FORM_CODE, FORM_WITH_PASSWORD);
+                                i.putExtra(USER_EMAIL, email);
+                                i.putExtra(USER_FULLNAME, fullname);
+                                startActivityForResult(i, REQUEST_COMPLETE_REGISTRATION);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+
                     }
-                } else {
-                    // ada error
-                    Log.d("fb login", e.getMessage());
-                }
-            }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("sync laravel user error", error.toString());
+                    }
         });
+        requestQueue.add(req);
+
+    }
+
+    private void getAccessTokenAfterFacebookLogin(String email){
+        RequestQueue que = Volley.newRequestQueue(getApplicationContext());
+        final HashMap<String, String> userInformation = new HashMap<String, String>(6);
+        userInformation.put("email", email);
+        JSONObject jsonInfo = new JSONObject(userInformation);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, getString(R.string.laravel_API_url) + "facebooklogin", jsonInfo,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("getaccesstoken", "login facebook sukses");
+                        Log.d("getaccesstoken", response.toString());
+                        try {
+                            Log.d("login fb", response.getString("token"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        //belum save token ke sharedpreference
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("getaccesstoken", "login facebook error");
+                        Log.d("getaccesstoken", error.toString());
+
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("user_access_token", AccessToken.getCurrentAccessToken().getToken());
+                return params;
+            }
+        };
+        que.add(request);
+
     }
 
 
