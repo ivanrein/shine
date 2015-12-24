@@ -156,7 +156,7 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                                 public void onResponse(JSONObject response) {
                                     Log.d("register", "register laravel sukses");
                                     Log.d("register", response.toString());
-                                    //sukses. ga dapet token soalnya kalo register biasa ga langsung ke login. tinggal kasih notif register sukses
+                                    //udah sukses. ga dapet token soalnya kalo register biasa ga langsung ke login. tinggal kasih notif register sukses
                                     finish();
                                 }
                             },

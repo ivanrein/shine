@@ -163,30 +163,52 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
             //ParseUser.logOut();
         }
-        // LOGIN PAKE PARSE
+        // LOGIN ke backend laravel
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                ParseUser.logInInBackground(email.getText().toString(), pwd.getText().toString(), new LogInCallback() {
-                    @Override
-                    public void done(ParseUser user, ParseException e) {
-
-                        if (user != null) {
-                            //success login, lanjut ke home activity
-
-                            ShineUser.setCurrentUser(ParseUser.getCurrentUser().get("username").toString(),
-                                    ParseUser.getCurrentUser().get("school").toString(),
-                                    ParseUser.getCurrentUser().get("gender").toString(),
-                                    ParseUser.getCurrentUser().get("name").toString());
-                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                            startActivity(i);
-                        } else {
-
+                RequestQueue mQue = Volley.newRequestQueue(getApplicationContext());
+                HashMap<String, String> map = new HashMap<String, String>(6);
+                map.put("email", email.getText().toString());
+                map.put("password", pwd.getText().toString());
+                JSONObject userInfo = new JSONObject(map);
+                JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST,
+                        getString(R.string.laravel_API_url) + "login", userInfo,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                //dapet token, save ke preferences, masuk ke home activity
+                                //bentuknya kayak gini {"result":"success","token":"KGucVHEmBytREzb0C1ZnT0mat9YnpQWhsm2aOkXzfqEOFPjf1Vj2neOHNq7I"}
+                                Log.d("login", response.toString());
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                //tampilin notif error
+                                Log.d("login error", error.toString());
+                            }
                         }
-                    }
-                });
+                );
+                mQue.add(req);
+//                ParseUser.logInInBackground(email.getText().toString(), pwd.getText().toString(), new LogInCallback() {
+//                    @Override
+//                    public void done(ParseUser user, ParseException e) {
+//
+//                        if (user != null) {
+//                            //success login, lanjut ke home activity
+//
+//                            ShineUser.setCurrentUser(ParseUser.getCurrentUser().get("username").toString(),
+//                                    ParseUser.getCurrentUser().get("school").toString(),
+//                                    ParseUser.getCurrentUser().get("gender").toString(),
+//                                    ParseUser.getCurrentUser().get("name").toString());
+//                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+//                            startActivity(i);
+//                        } else {
+//
+//                        }
+//                    }
+//                });
             }
         });
 
