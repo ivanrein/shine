@@ -5,30 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.shineapptpa.rei.shine.MyProfileActivity">
+    tools:context="com.shineapptpa.rei.shine.MyProfileActivity"
+    android:weightSum="1">
 
     <include layout="@layout/toolbar"/>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".5"
+        android:layout_weight="0.8"
         android:id="@+id/top_container"
-        />
+        android:background="@color/lightPrimary"
+        android:layout_marginBottom="10dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        >
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:divider="@color/darkPrimary"
-            android:showDividers="end"
-            android:layout_margin="10dp">
+            android:layout_margin="10dp"
+            >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -36,8 +46,8 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Large Text"
                 android:id="@+id/tvFullname"
-                android:layout_marginBottom="10dp"
-                android:textSize="25sp"/>
+                android:layout_marginBottom="0dp"
+                android:textSize="20sp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -45,8 +55,8 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text=", "
                 android:id="@+id/textView6"
-                android:layout_marginBottom="10dp"
-                android:textSize="25sp"/>
+                android:layout_marginBottom="0dp"
+                android:textSize="20sp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -54,36 +64,26 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Large Text"
                 android:id="@+id/tvAge"
-                android:layout_marginBottom="10dp"
-                android:textSize="25sp"/>
+                android:layout_marginBottom="0dp"
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:id="@+id/ivGender"
+                android:src="@drawable/gentleman"
+                android:layout_marginLeft="20dp"/>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="10dp"
-            android:divider="@color/darkPrimary"
-            android:showDividers="end"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/txt_gender"
-                android:id="@+id/asd"
-                android:layout_marginBottom="10dp"
-                android:textSize="25sp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New Text"
-                android:id="@+id/tvGender"
-                android:textSize="20dp"/>
-        </LinearLayout>
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/tvSchool"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -99,17 +99,27 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/txt_bio"
                 android:id="@+id/textView2"
-                android:layout_marginBottom="10dp"
-                android:textSize="25sp"/>
+                android:layout_marginBottom="5dp"
+                android:textSize="20sp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="New Text"
                 android:id="@+id/tvBio"
-                android:textSize="20dp"/>
+                android:editable="true"
+                android:textSize="17sp"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/tvBioEdit"
+                android:visibility="gone"
+                android:editable="true"
+                android:textSize="17sp"/>
         </LinearLayout>
 
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

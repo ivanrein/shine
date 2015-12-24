@@ -9,6 +9,7 @@
     android:layout_gravity="center_horizontal"
     app:columnCount="3"
     app:rowCount="3"
+    android:id="@+id/edit_photos_fragment"
     android:background="@color/lightPrimary"
     android:padding="10dp"
     >
@@ -29,7 +30,6 @@
         app:layout_column="0"
         app:layout_columnSpan="2"
         android:scaleType="fitXY"
-
         app:layout_rowSpan="2"
         android:elevation="3dp"
         />

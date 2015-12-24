@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class HomeActivity extends BaseActivity {
 
@@ -32,6 +33,8 @@ public class HomeActivity extends BaseActivity {
     private TextView mTextViewUsername, mTextViewSchool;
     private RelativeLayout mRelativeLayoutUserInfo;
     private ArrayList<NavItem> mNavbarItems = new ArrayList<NavItem>();
+    private ArrayList<Integer> mPhotoResources;
+
 
 
     @Override
@@ -39,8 +42,15 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         setToolbar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mPhotoResources = new ArrayList<Integer>();
+        mPhotoResources.add(R.drawable.dummy_1);
+        mPhotoResources.add(R.drawable.dummy_2);
+        mPhotoResources.add(R.drawable.dummy_6);
+        mPhotoResources.add(R.drawable.dummy_4);
+        mPhotoResources.add(R.drawable.dummy_5);
+        mPhotoResources.add(R.drawable.dummy_5);
         initializeNavbar();
-
         setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
     }
 
@@ -61,7 +71,14 @@ public class HomeActivity extends BaseActivity {
         mRelativeLayoutUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = MyProfileActivity.newIntent(HomeActivity.this);
+                Intent intent = MyProfileActivity.newIntent(
+                        HomeActivity.this,
+                        "Erick Marchelino",
+                        new Date(1995, 3, 17),
+                        "nanannaa",
+                        "Male",
+                        mPhotoResources
+                        );
                 startActivity(intent);
             }
         });
@@ -102,7 +119,6 @@ public class HomeActivity extends BaseActivity {
         mTextViewUsername.setText("Binus University");
 
         mNavbarLayout.setDrawerListener(mActionBarDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         refreshNavbar();
     }
 
@@ -126,6 +142,7 @@ public class HomeActivity extends BaseActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onPostCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
