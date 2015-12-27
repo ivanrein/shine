@@ -12,4 +12,9 @@
     <string name="txt_guest">Guest</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="txt_bio">Biography</string>
+    <string name="txt_gender">Gender</string>
+    <string name="txt_editProfile">Edit Profile</string>
+    <string name="txt_done">Done</string>
+    <string name="txt_cancel">Cancel</string>
 </resources>

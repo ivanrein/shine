@@ -17,14 +17,12 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -36,15 +34,12 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CompleteSignUpActivity extends AppCompatActivity {
 
     ArrayAdapter<String> adapter;
     ArrayList<String> schools;
-    ArrayList<Integer> schools_id;
     Button completeRegistrationBtn;
     EditText mFullNameOrPwd;
     EditText mBio;
@@ -64,7 +59,6 @@ public class CompleteSignUpActivity extends AppCompatActivity {
         mSchoolSpinner = (Spinner)findViewById(R.id.schools);
         mBio = (EditText)findViewById(R.id.bio);
         schools = new ArrayList<>();
-        schools_id = new ArrayList<>();
         completeRegistrationBtn = (Button)findViewById(R.id.submit_btn);
         final boolean formWithPassword = getIntent().getIntExtra(MainActivity.FORM_CODE,
                 MainActivity.FORM_WITHOUT_PASSWORD) == MainActivity.FORM_WITH_PASSWORD;
@@ -77,9 +71,8 @@ public class CompleteSignUpActivity extends AppCompatActivity {
         completeRegistrationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mRequestQue == null){
-                    mRequestQue = Volley.newRequestQueue(getApplicationContext());
-                }
+                //FORM WITH PASSWORD means the user sign up with FACEBOOK. This means
+                // WE GOT NAME AND EMAIL, BUT NOT PASSWORD. SO WE HAVE TO PROVIDE FORM FOR PASSWORD.
                 String gender;
                 String userFullName;
                 String userPassword;
@@ -88,99 +81,56 @@ public class CompleteSignUpActivity extends AppCompatActivity {
 
                 if(male.isChecked()) gender = "male";
                 else gender = "female";
-                //FORM WITH PASSWORD means the user sign up with FACEBOOK. This means
-                // WE GOT NAME AND EMAIL, BUT NOT PASSWORD. SO WE HAVE TO PROVIDE FORM FOR PASSWORD.
+
                 if(formWithPassword){
-                    Log.d("register", "masuk sign up facebook");
-                    Log.d("register", AccessToken.getCurrentAccessToken().getToken());
+
                     userFullName = getIntent().getStringExtra(MainActivity.USER_FULLNAME);
                     userPassword = mFullNameOrPwd.getText().toString();
-                    final HashMap<String, String> userInformation = new HashMap<String, String>(6);
-                    userInformation.put("email", userEmail);
-                    userInformation.put("gender", gender);
-                    userInformation.put("bio", bio);
-                    userInformation.put("name", userFullName);
-                    userInformation.put("password", userPassword);
-                    userInformation.put("school_id", schools_id.get((Integer)mSchoolSpinner.getSelectedItemPosition()).toString());
+                    ParseUser user = new ParseUser();
+                    user.setUsername(userEmail);
+                    user.setPassword(userPassword);
+                    user.put("name", userFullName);
+                    user.put("bio", bio);
+                    user.put("gender", gender);
+                    user.put("school", mSchoolSpinner.getSelectedItem().toString());
+                    //sign up the user in PARSE. this also log the user in (on parse backend)
+                    user.signUpInBackground(new SignUpCallback() {
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                //success sign up
 
-                    JSONObject jsonInfo = new JSONObject(userInformation);
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, getString(R.string.laravel_API_url) + "facebooklogin", jsonInfo,
-                            new Response.Listener<JSONObject>() {
-
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    Log.d("register", "register laravel sukses");
-                                    Log.d("register", response.toString());
-
-                                    try {
-                                        String acToken = response.getString("token");
-                                        JSONObject userInfos = response.getJSONObject("user");
-                                        JSONObject schoolInfo = userInfos.getJSONObject("school");
-                                        CustomPref.setUserAccessToken(getApplicationContext(),
-                                                acToken);
-                                        ShineUser.resetCurrent();
-                                        ShineUser.setCurrentUser(userInfos, schoolInfo);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    setResult(RESULT_OK);
-                                    finish();
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d("register", "register laravel error");
-                                    Log.d("register", error.toString());
-
-                                }
-                            }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String>  params = new HashMap<String, String>();
-                            params.put("fbtoken", AccessToken.getCurrentAccessToken().getToken());
-                            return params;
+                                setResult(RESULT_OK);
+                                finish();
+                            } else {
+                                //failed sign up
+                            }
                         }
-                    };
-                    mRequestQue.add(request);
-
+                    });
                 }else{
-                    //USER SIGN UP TO USUAL BACKEND. WE PROVIDE FORM FOR FULLNAME, BUT NOT PASSWORD.
-                    Log.d("register", "masuk sign up biasa");
+                    //ELSE, the user SIGN UP WITH PARSE. THIS MEANS WE GOT EMAIL AND PASSWORD, BUT NOT NAME. WE PROVIDE FORM FOR FULLNAME, BUT NOT PASSWORD.
+
                     userFullName = mFullNameOrPwd.getText().toString();
                     userPassword = getIntent().getStringExtra(MainActivity.USER_PASSWORD);
+                    ParseUser user = new ParseUser();
+                    user.setUsername(userEmail);
+                    user.setPassword(userPassword);
+                    user.put("name", userFullName);
+                    user.put("bio", bio);
+                    user.put("gender", gender);
+                    user.put("school", mSchoolSpinner.getSelectedItem().toString());
+                    user.signUpInBackground(new SignUpCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
 
-                    final HashMap<String, String> userInformation = new HashMap<String, String>(6);
-                    userInformation.put("email", userEmail);
-                    userInformation.put("gender", gender);
-                    userInformation.put("bio", bio);
-                    userInformation.put("name", userFullName);
-                    userInformation.put("password", userPassword);
-                    userInformation.put("school_id", schools_id.get((Integer)mSchoolSpinner.getSelectedItemPosition()).toString());
 
-                    JSONObject jsonInfo = new JSONObject(userInformation);
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, getString(R.string.laravel_API_url) + "register", jsonInfo,
-                            new Response.Listener<JSONObject>() {
+                                setResult(RESULT_OK);
+                                finish();
+                            }else{
 
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    Log.d("register", "register laravel sukses");
-                                    Log.d("register", response.toString());
-                                    //udah sukses. ga dapet token soalnya kalo register biasa ga langsung ke login. tinggal kasih notif register sukses
-                                    finish();
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d("register", "register laravel error");
-                                    Log.d("register", error.toString());
-                                    // masuk sini error, biasanya gara" email udah taken. tinggal kasih notif.
-                                }
-                            }){
-
-                    };
-                    mRequestQue.add(request);
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -226,10 +176,9 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                             public void onResponse(JSONObject response) {
                                 JSONArray arr = null;
                                 try {
-                                    arr = response.getJSONArray("schools");
+                                    arr = response.getJSONArray("school");
                                     for (int i = 0; i < arr.length(); i++) {
                                         schools.add(arr.getJSONObject(i).getString("name"));
-                                        schools_id.add(arr.getJSONObject(i).getInt("id"));
                                     }
                                     adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, schools);
                                     adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);

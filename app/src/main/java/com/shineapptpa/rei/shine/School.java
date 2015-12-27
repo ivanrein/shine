@@ -14,7 +14,6 @@ public class School implements Serializable {
         this.name = name;
         this.latitude = lat;
         this.longitude = lon;
-
     }
 
     public String getName() {
@@ -28,7 +27,6 @@ public class School implements Serializable {
     public double getLongitude() {
         return longitude;
     }
-
 
     @Override
     public String toString() {
