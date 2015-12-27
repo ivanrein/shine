@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String USER_FULLNAME = "user_fullname";
     public final static String USER_PASSWORD = "user_password";
     public final static int REQUEST_COMPLETE_REGISTRATION = 9;
+
     // FUNGSI DIPANGGIL ABIS FB LOGIN
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override

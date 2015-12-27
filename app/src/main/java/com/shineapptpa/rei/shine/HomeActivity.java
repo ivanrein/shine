@@ -51,12 +51,13 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     private TextView mTextViewUsername;
     private ArrayList<NavItem> mNavbarItems = new ArrayList<NavItem>();
     private GoogleApiClient mGoogleApiClient;
+    private HashMap<String, String> currUser;
     Location lastLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        currUser = ShineUser.getCurrentUser();
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayShowTitleEnabled(true);
