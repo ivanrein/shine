@@ -67,35 +67,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         initializeNavbar();
 
-        RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "test", null,
-                new Response.Listener<JSONObject>(){
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                            Log.d("token", response.toString());
-                        try {
-                            Log.d("token", response.getString("token"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.d("connection", "Volley GET failed");
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("connection", error.getMessage().toString());
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("token", "asd");
-                return params;
-            }
-        };
-        mRequestQue.add(request);
     }
 
     @Override

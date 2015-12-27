@@ -3,6 +3,7 @@ package com.shineapptpa.rei.shine;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -125,7 +126,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // init parse. required for parse shits
-        Parse.initialize(this, "lxgqT6WpdVx74zhmLgv9cZbOyhSkKEvKo22m1T4K", "eAtZqm1s49seXvrvspoFpYx3IVCCfO9vwTvDffQ0");
+        Parse.initialize(this, "lxgqT6WpdVx74zhmLgv9cZbOyhSkKEvKo22m1T4K",
+                "eAtZqm1s49seXvrvspoFpYx3IVCCfO9vwTvDffQ0");
 
         // init facebook SDK. required for displaying facebook shits
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -156,13 +158,13 @@ public class MainActivity extends AppCompatActivity {
         email = (EditText)findViewById(R.id.email);
         pwd = (EditText)findViewById(R.id.pwd);
 
-
-        if(ParseUser.getCurrentUser() != null){
-            Log.d("user not null", "start new acti");
+        if(CustomPref.getUserAccessToken(getApplicationContext()) != null){
             Intent i = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(i);
-            //ParseUser.logOut();
         }
+
+
+
         // LOGIN ke backend laravel
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,7 +181,26 @@ public class MainActivity extends AppCompatActivity {
                             public void onResponse(JSONObject response) {
                                 //dapet token, save ke preferences, masuk ke home activity
                                 //bentuknya kayak gini {"result":"success","token":"KGucVHEmBytREzb0C1ZnT0mat9YnpQWhsm2aOkXzfqEOFPjf1Vj2neOHNq7I"}
-                                Log.d("login", response.toString());
+                                //SharedPreferences pref = getSharedPreferences("")
+                                try {
+                                    Log.d("login", response.toString());
+                                    if(response.getString("result").equals("success")) {
+                                        String acToken = response.getString("token");
+                                        JSONObject userInfos = response.getJSONObject("user");
+                                        JSONObject schoolInfo = userInfos.getJSONObject("school");
+                                        Log.d("login", schoolInfo.toString());
+                                        CustomPref.setUserAccessToken(getApplicationContext(),
+                                                acToken);
+                                        ShineUser.resetCurrent();
+                                        ShineUser.setCurrentUser(userInfos, schoolInfo);
+                                        Intent i = new Intent(getApplicationContext(),
+                                                HomeActivity.class);
+                                        startActivity(i);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
                         },
                         new Response.ErrorListener() {
@@ -191,28 +212,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                 );
                 mQue.add(req);
-//                ParseUser.logInInBackground(email.getText().toString(), pwd.getText().toString(), new LogInCallback() {
-//                    @Override
-//                    public void done(ParseUser user, ParseException e) {
-//
-//                        if (user != null) {
-//                            //success login, lanjut ke home activity
-//
-//                            ShineUser.setCurrentUser(ParseUser.getCurrentUser().get("username").toString(),
-//                                    ParseUser.getCurrentUser().get("school").toString(),
-//                                    ParseUser.getCurrentUser().get("gender").toString(),
-//                                    ParseUser.getCurrentUser().get("name").toString());
-//                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-//                            startActivity(i);
-//                        } else {
-//
-//                        }
-//                    }
-//                });
+
             }
         });
 
-        // signup with Parse
+        // signup biasa
         mRegis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -257,13 +261,10 @@ public class MainActivity extends AppCompatActivity {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_COMPLETE_REGISTRATION){
             if(resultCode == Activity.RESULT_OK){
-                Log.d("logout", "logout result ok");
                 Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(i);
             }else{
-                Log.d("logout", "logout result cancelled");
                 LoginManager.getInstance().logOut();
-
             }
         }
     }
@@ -276,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
         userInformation.put("email", email);
         JSONObject jsonInfo = new JSONObject(userInformation);
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET,
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST,
                 getString(R.string.laravel_API_url) + "CheckUser", jsonInfo,
                 new Response.Listener<JSONObject>() {
 
@@ -285,11 +286,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
 
                         try {
-                            String user= response.getString("user");
+
+                            Log.d("synclaravel", response.toString());
+                            String user = response.getString("user");
+                            Log.d("synclaravel", user.toString());
                             if(user != "null") {
                                 Log.d("sync laravel user", "getting acces token after fb login");
                                 getAccessTokenAfterFacebookLogin(email);
-
                             }else{
                                 Log.d("sync laravel user", "go to complete form");
                                 Intent i = new Intent(getApplicationContext(), CompleteSignUpActivity.class);
@@ -328,7 +331,16 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("getaccesstoken", "login facebook sukses");
                         Log.d("getaccesstoken", response.toString());
                         try {
-                            Log.d("login fb", response.getString("token"));
+                            String acToken =  response.getString("token");
+                            JSONObject userInfos = response.getJSONObject("user");
+                            JSONObject schoolInfo = userInfos.getJSONObject("school");
+                            CustomPref.setUserAccessToken(getApplicationContext(),
+                                    acToken);
+                            ShineUser.resetCurrent();
+                            ShineUser.setCurrentUser(userInfos, schoolInfo);
+                            Intent i = new Intent(getApplicationContext(),
+                                    HomeActivity.class);
+                            startActivity(i);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -347,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String>  params = new HashMap<String, String>();
-                params.put("user_access_token", AccessToken.getCurrentAccessToken().getToken());
+                params.put("fbtoken", AccessToken.getCurrentAccessToken().getToken());
                 return params;
             }
         };

@@ -111,8 +111,18 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                                 public void onResponse(JSONObject response) {
                                     Log.d("register", "register laravel sukses");
                                     Log.d("register", response.toString());
-                                    // dapet json {"result":"success","token":"xsFGTu4YkE2mOdkUlKmYyYaH8dIcOFR2jHvgZJDuJaJmT5dRvXtsvWenMHtk"}
-                                    //belum save token ke sharedpreference
+
+                                    try {
+                                        String acToken = response.getString("token");
+                                        JSONObject userInfos = response.getJSONObject("user");
+                                        JSONObject schoolInfo = userInfos.getJSONObject("school");
+                                        CustomPref.setUserAccessToken(getApplicationContext(),
+                                                acToken);
+                                        ShineUser.resetCurrent();
+                                        ShineUser.setCurrentUser(userInfos, schoolInfo);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                     setResult(RESULT_OK);
                                     finish();
                                 }
