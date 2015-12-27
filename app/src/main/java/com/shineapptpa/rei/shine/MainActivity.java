@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // init parse. required for parse shits
-        Parse.initialize(this, "lxgqT6WpdVx74zhmLgv9cZbOyhSkKEvKo22m1T4K",
-                "eAtZqm1s49seXvrvspoFpYx3IVCCfO9vwTvDffQ0");
+//        Parse.initialize(this, "lxgqT6WpdVx74zhmLgv9cZbOyhSkKEvKo22m1T4K",
+//                "eAtZqm1s49seXvrvspoFpYx3IVCCfO9vwTvDffQ0");
 
         // init facebook SDK. required for displaying facebook shits
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -196,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
                                         Intent i = new Intent(getApplicationContext(),
                                                 HomeActivity.class);
                                         startActivity(i);
+                                        finish();
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -341,10 +342,11 @@ public class MainActivity extends AppCompatActivity {
                             Intent i = new Intent(getApplicationContext(),
                                     HomeActivity.class);
                             startActivity(i);
+                            finish();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        //belum save token ke sharedpreference
+
 
                     }
                 },

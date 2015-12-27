@@ -27,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -43,6 +44,7 @@ import java.util.Map;
 public class HomeActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     public static ListView mNavbarList;
+    private final static int GOOGLE_PLAY_UPDATE_REQUEST = 10;
     private RelativeLayout mNavbarPanel;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private DrawerLayout mNavbarLayout;
@@ -64,7 +66,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+            Log.d("homeac", "google api client is null");
         }
+        Log.d("homeac", "home activity created");
         initializeNavbar();
 
 
@@ -72,7 +76,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onStart() {
-        mGoogleApiClient.connect();
+        if(lastLocation == null) {
+            mGoogleApiClient.connect();
+        }
         super.onStart();
     }
 
@@ -114,9 +120,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
         //dummy data
-        mNavbarItems.add(new NavItem("Coba1", "descccaa", R.drawable.com_facebook_button_icon));
+        mNavbarItems.add(new NavItem("MyProfile", "Set your profile setting and more", R.drawable.com_facebook_button_icon));
         mNavbarItems.add(new NavItem("Coba2", "descccss", R.drawable.com_facebook_button_icon));
-        mNavbarItems.add(new NavItem("Coba3", "descccww", R.drawable.com_facebook_button_icon));
+        mNavbarItems.add(new NavItem("Logout", "Logout from Shine", R.drawable.com_facebook_button_icon));
         mTextViewUsername.setText("Guest");
 
         mNavbarLayout.setDrawerListener(mActionBarDrawerToggle);
@@ -128,6 +134,17 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     {
         //start intent from the nav bar here broh
         Toast.makeText(HomeActivity.this, mNavbarItems.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+        if(position == 0){ // ke myprofile
+
+        }
+        if(position == 2){ // logout
+            if(CustomPref.resetAccessToken(getApplicationContext())){
+                LoginManager.getInstance().logOut();
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        }
     }
 
     public void refreshNavbar()
@@ -151,6 +168,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         mActionBarDrawerToggle.syncState();
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -200,14 +221,14 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d("connection", (" " + connectionResult.getErrorCode()));
-        GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 10).show();
+        GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, GOOGLE_PLAY_UPDATE_REQUEST).show();
     }
 
     //handling connection google API error
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 10){
+        if(requestCode == GOOGLE_PLAY_UPDATE_REQUEST){
             if(resultCode == RESULT_OK){
                 mGoogleApiClient.connect();
             }

@@ -23,4 +23,10 @@ public class CustomPref {
                 .putString(PREF_ACCESS_TOKEN, acToken)
                 .apply();
     }
+
+    public static boolean resetAccessToken(Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().remove(PREF_ACCESS_TOKEN).commit();
+
+    }
 }
