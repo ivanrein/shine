@@ -87,15 +87,15 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         currUser = ShineUser.getCurrentUser();
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        if(mGoogleApiClient == null){
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            Log.d("homeac", "google api client is null");
-        }
+//        getSupportActionBar().setDisplayShowTitleEnabled(true); // ini emang di comment
+//        if(mGoogleApiClient == null){
+//            mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                    .addConnectionCallbacks(this)
+//                    .addOnConnectionFailedListener(this)
+//                    .addApi(LocationServices.API)
+//                    .build();
+//            Log.d("homeac", "google api client is null");
+//        }
         Log.d("homeac", "home activity created");
         initializeNavbar();
 
@@ -104,15 +104,15 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 
     @Override
     protected void onStart() {
-        if(lastLocation == null) {
-            mGoogleApiClient.connect();
-        }
+//        if(lastLocation == null) {
+//            mGoogleApiClient.connect();
+//        }
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+    //    mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -223,41 +223,41 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 
     @Override
     public void onConnected(Bundle bundle) {
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if(lastLocation != null){
-            Log.d("location", "location not null");
-            // fetch user accordingly
-            RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "schools", null,
-                    new Response.Listener<JSONObject>(){
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                Log.d("token", response.getJSONObject("token").toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Log.d("connection", "Volley GET failed");
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d("connection", error.getMessage().toString());
-                        }
-                    }){
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<String, String>();
-                    params.put("token", "asd");
-                    return super.getHeaders();
-                }
-            };
-        }else{
-            //display error message: can't get location
-        }
+//        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+//        if(lastLocation != null){
+//            Log.d("location", "location not null");
+//            // fetch user accordingly
+//            RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
+//            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "schools", null,
+//                    new Response.Listener<JSONObject>(){
+//
+//                        @Override
+//                        public void onResponse(JSONObject response) {
+//                            try {
+//                                Log.d("token", response.getJSONObject("token").toString());
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                                Log.d("connection", "Volley GET failed");
+//                            }
+//                        }
+//                    },
+//                    new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            Log.d("connection", error.getMessage().toString());
+//                        }
+//                    }){
+//                @Override
+//                public Map<String, String> getHeaders() throws AuthFailureError {
+//                    Map<String, String>  params = new HashMap<String, String>();
+//                    params.put("token", "asd");
+//                    return super.getHeaders();
+//                }
+//            };
+//        }else{
+//            //display error message: can't get location
+//        }
 
     }
 
@@ -276,10 +276,10 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GOOGLE_PLAY_UPDATE_REQUEST){
-            if(resultCode == RESULT_OK){
-                mGoogleApiClient.connect();
-            }
-        }
+//        if(requestCode == GOOGLE_PLAY_UPDATE_REQUEST){
+//            if(resultCode == RESULT_OK){
+//                mGoogleApiClient.connect();
+//            }
+//        }
     }
 }
