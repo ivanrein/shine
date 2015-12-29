@@ -76,6 +76,8 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         mPhotoResources.add(R.drawable.dummy_5);
         initializeNavbar();
         setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
+        Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
+        startService(NotifPoolIntent);
     }
 
     private void setUser(String name, String school, int profilePicture)
