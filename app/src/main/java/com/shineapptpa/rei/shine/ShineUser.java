@@ -14,7 +14,8 @@ public class ShineUser {
     private static HashMap<String, String> currentUser;
     private static HashMap<String, String> currentSchool;
 
-    private HashMap<String, String> user;
+    private
+    HashMap<String, String> user;
     private HashMap<String, String> school;
 
 

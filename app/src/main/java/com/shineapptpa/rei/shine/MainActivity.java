@@ -36,10 +36,10 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.parse.LogInCallback;
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseUser;
+//import com.parse.LogInCallback;
+//import com.parse.Parse;
+//import com.parse.ParseException;
+//import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
