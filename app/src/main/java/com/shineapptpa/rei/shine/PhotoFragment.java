@@ -1,5 +1,6 @@
 package com.shineapptpa.rei.shine;
 
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,4 +46,6 @@ public class PhotoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
+
 }

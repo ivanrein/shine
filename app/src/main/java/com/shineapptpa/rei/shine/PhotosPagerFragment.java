@@ -37,13 +37,14 @@ public class PhotosPagerFragment extends Fragment {
         PhotosPagerFragment fragment = new PhotosPagerFragment();
         fragment.setArguments(args);
         return fragment;
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_photos_pager, container, false);
-
+        // ni ada yang error" abis pindahan dari yang pake array list integer itu.. harusnya tar dihapus
         mViewPager = (ViewPager) v.findViewById(R.id.photos_viewpager);
         mPhotoResources = (ArrayList<Integer>) PhotosPagerFragment.this.getArguments().getSerializable(ARGS_PHOTO_RESOURCES);
         FragmentManager fragmentManager = getChildFragmentManager();

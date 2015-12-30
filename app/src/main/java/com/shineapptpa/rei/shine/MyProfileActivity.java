@@ -1,10 +1,16 @@
 package com.shineapptpa.rei.shine;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.service.voice.VoiceInteractionSession;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,11 +19,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MyProfileActivity extends BaseActivity {
 
@@ -26,8 +45,8 @@ public class MyProfileActivity extends BaseActivity {
     public static final String EXTRA_USER_GENDER = "com.shineapptpa.rei.myprofileactivity.gender";
     public static final String EXTRA_USER_BIO = "com.shineapptpa.rei.myprofileactivity.bio";
     public static final String EXTRA_USER_SCHOOL = "com.shineapptpa.rei.myprofileactivity.school";
-    public static final String EXTRA_USER_IMAGES = "com.shineapptpa.rei.myprofileactivity.images";
-   // public static final String EXTRA_USER_EMAIL = "com.shineapptpa.rei.myprofileactivity.email";
+   // public static final String EXTRA_USER_IMAGES = "com.shineapptpa.rei.myprofileactivity.images";
+    public static final String EXTRA_USER_EMAIL = "com.shineapptpa.rei.myprofileactivity.email";
     private FragmentManager mFragmentManager;
     private Fragment mFragment;
     public TextView mTextViewBio, mTextViewAge, mTextViewUser, mTextViewSchool;
@@ -35,7 +54,7 @@ public class MyProfileActivity extends BaseActivity {
     ImageView mImageViewGender;
 
   //  ArrayList<Integer> photoResources;
-
+    ArrayList<Bitmap> photoList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +66,57 @@ public class MyProfileActivity extends BaseActivity {
 
         initialize();
         bindView();
+
+        //fetch foto dari db
+        RequestQueue q = Volley.newRequestQueue(this);
+        HashMap<String, String> email = new HashMap<>();
+        email.put("email", (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL));
+        JSONObject json = new JSONObject(email);
+        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos", json,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            JSONArray photos= response.getJSONArray("photos");
+                            for (int i = 0; i < photos.length(); i++){
+                                // decode base64 dari DB dlu. ni ntar harus dipindahin ke async task
+                                byte[] decodedString = Base64.decode(photos.getJSONObject(i).getString("photo"), Base64.DEFAULT);
+                                // dari byte ke Bitmap
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inJustDecodeBounds = true; // katanya bwt masalah ngecil"in, pake injustdecodebounds true biar ga ditampung memory
+                                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
+                                // ni insamplesize buat ngecilin gambarnya ceritanya, param 2 sama 3 di calculate itu
+                                // harusnya buat dikecilin jadi seberapa, tapi gw ga bisa tau di sini soalnya
+                                // ukuran ImageViewnya adanya di PhotoFragment. anu'in dulu enaknya gimana.
+                                // method calculate nya ngambil dri web android btw
+                                options.inSampleSize = calculateInSampleSize(options, ?,?);
+                                options.inJustDecodeBounds = false;
+
+                                //kalo udah beres, baru dimasukin ke photoList, pake bitmapfactory ama options yang baru
+                                photoList.add(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
+                return map;
+            }
+        };
+        q.add(r);
+        //fetch foto done
 
         PhotosPagerFragment temp = PhotosPagerFragment.createInstance();
         if(mFragmentManager.getFragments() == null)
@@ -65,9 +135,15 @@ public class MyProfileActivity extends BaseActivity {
         mImageViewGender = (ImageView) findViewById(R.id.ivGender);
         mTextViewBio = (TextView) findViewById(R.id.tvBio);
         editTextBio = (EditText) findViewById(R.id.tvBioEdit);
+        photoList = new ArrayList<>();
  //       photoResources = new ArrayList<Integer>();
     }
 
+    @Override
+    protected void onDestroy() {
+        photoList.clear();
+        super.onDestroy();
+    }
 
     //set data di sini
     public void bindView()
@@ -157,9 +233,32 @@ public class MyProfileActivity extends BaseActivity {
 
         PhotosPagerFragment fragment = PhotosPagerFragment.createInstance();
         mFragmentManager.beginTransaction()
-                .replace(R.id.top_container,fragment)
+                .replace(R.id.top_container, fragment)
                 .commit();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }
