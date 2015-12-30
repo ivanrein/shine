@@ -1,5 +1,7 @@
 package com.shineapptpa.rei.shine;
 
+
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;

@@ -1,6 +1,7 @@
 package com.shineapptpa.rei.shine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -76,6 +77,8 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         mPhotoResources.add(R.drawable.dummy_5);
         initializeNavbar();
         setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
+        Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
+        startService(NotifPoolIntent);
     }
 
     private void setUser(String name, String school, int profilePicture)
@@ -87,15 +90,15 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         currUser = ShineUser.getCurrentUser();
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        if(mGoogleApiClient == null){
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            Log.d("homeac", "google api client is null");
-        }
+//        getSupportActionBar().setDisplayShowTitleEnabled(true); // ini emang di comment
+//        if(mGoogleApiClient == null){
+//            mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                    .addConnectionCallbacks(this)
+//                    .addOnConnectionFailedListener(this)
+//                    .addApi(LocationServices.API)
+//                    .build();
+//            Log.d("homeac", "google api client is null");
+//        }
         Log.d("homeac", "home activity created");
         initializeNavbar();
 
@@ -104,15 +107,30 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 
     @Override
     protected void onStart() {
-        if(lastLocation == null) {
-            mGoogleApiClient.connect();
-        }
+//        if(lastLocation == null) {
+//            mGoogleApiClient.connect();
+//        }
         super.onStart();
+        if(CustomPref.getUserAccessToken(this) == null){
+            LoginManager.getInstance().logOut();
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(i);
+            finish();
+        }
+        if(ShineUser.getCurrentUser() == null){
+            Log.d("onstart home", "currentuser null");
+            ShineUser.fetchCurrentUser(this, new CustomCallback() {
+                @Override
+                public void callback() {
+
+                }
+            });
+        }
     }
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+    //    mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -126,15 +144,27 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         mRelativeLayoutUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = MyProfileActivity.newIntent(
-                        HomeActivity.this,
-                        "Erick Marchelino",
-                        new Date(1995, 3, 17),
-                        "nanannaa",
-                        "Male",
-                        mPhotoResources
-                        );
-                startActivity(intent);
+//                Intent intent = MyProfileActivity.newIntent(
+//                        HomeActivity.this,
+//                        "Erick Marchelino",
+//                        new Date(1995, 3, 17),
+//                        "nanannaa",
+//                        "Male", "contoh@yahoo.com",
+//                        mPhotoResources
+//                        );
+                if(ShineUser.getCurrentUser() != null){
+                    Intent intent = MyProfileActivity.newIntent(HomeActivity.this, ShineUser.getCurrentUser());
+                    startActivity(intent);
+                }else{
+                    if(!ShineUser.fetching){
+                        ShineUser.fetchCurrentUser(getApplicationContext(), new CustomCallback() {
+                            @Override
+                            public void callback() {
+
+                            }
+                        });
+                    }
+                }
             }
         });
 
@@ -223,41 +253,41 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 
     @Override
     public void onConnected(Bundle bundle) {
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if(lastLocation != null){
-            Log.d("location", "location not null");
-            // fetch user accordingly
-            RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "schools", null,
-                    new Response.Listener<JSONObject>(){
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                Log.d("token", response.getJSONObject("token").toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Log.d("connection", "Volley GET failed");
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d("connection", error.getMessage().toString());
-                        }
-                    }){
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String>  params = new HashMap<String, String>();
-                    params.put("token", "asd");
-                    return super.getHeaders();
-                }
-            };
-        }else{
-            //display error message: can't get location
-        }
+//        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+//        if(lastLocation != null){
+//            Log.d("location", "location not null");
+//            // fetch user accordingly
+//            RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
+//            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "schools", null,
+//                    new Response.Listener<JSONObject>(){
+//
+//                        @Override
+//                        public void onResponse(JSONObject response) {
+//                            try {
+//                                Log.d("token", response.getJSONObject("token").toString());
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                                Log.d("connection", "Volley GET failed");
+//                            }
+//                        }
+//                    },
+//                    new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            Log.d("connection", error.getMessage().toString());
+//                        }
+//                    }){
+//                @Override
+//                public Map<String, String> getHeaders() throws AuthFailureError {
+//                    Map<String, String>  params = new HashMap<String, String>();
+//                    params.put("token", "asd");
+//                    return super.getHeaders();
+//                }
+//            };
+//        }else{
+//            //display error message: can't get location
+//        }
 
     }
 
@@ -276,10 +306,10 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GOOGLE_PLAY_UPDATE_REQUEST){
-            if(resultCode == RESULT_OK){
-                mGoogleApiClient.connect();
-            }
-        }
+//        if(requestCode == GOOGLE_PLAY_UPDATE_REQUEST){
+//            if(resultCode == RESULT_OK){
+//                mGoogleApiClient.connect();
+//            }
+//        }
     }
 }

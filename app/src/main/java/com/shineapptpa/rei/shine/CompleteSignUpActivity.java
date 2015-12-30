@@ -26,9 +26,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
+//import com.parse.ParseException;
+//import com.parse.ParseUser;
+//import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;

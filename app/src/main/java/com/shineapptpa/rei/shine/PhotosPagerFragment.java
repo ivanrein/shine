@@ -25,10 +25,12 @@ public class PhotosPagerFragment extends Fragment {
     public static final String ARGS_PHOTO_RESOURCES = "com.shineapptpa.rei.shine.photosfragment.photos";
     private ArrayList<Integer> mPhotoResources;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
 
     public static PhotosPagerFragment createInstance(ArrayList<Integer> photoResources)
     {
@@ -37,6 +39,15 @@ public class PhotosPagerFragment extends Fragment {
         PhotosPagerFragment fragment = new PhotosPagerFragment();
         fragment.setArguments(args);
         return fragment;
+
+    public static PhotosPagerFragment createInstance()
+    {
+        Bundle args = new Bundle();
+        //args.putSerializable(PhotosPagerFragment.ARGS_PHOTO_RESOURCES, photoResources);
+        PhotosPagerFragment fragment = new PhotosPagerFragment();
+        fragment.setArguments(args);
+        return fragment;
+
     }
 
     @Nullable
@@ -44,8 +55,11 @@ public class PhotosPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_photos_pager, container, false);
 
+        // ni yg error" mau dipindahin jadi pake arraylist bitmap yg di MyProfileActivity
+        // hrusnya. ga ngerti caranya gw
         mViewPager = (ViewPager) v.findViewById(R.id.photos_viewpager);
-        mPhotoResources = (ArrayList<Integer>) PhotosPagerFragment.this.getArguments().getSerializable(ARGS_PHOTO_RESOURCES);
+        mPhotoResources = (ArrayList<Integer>) PhotosPagerFragment.this.getArguments()
+                .getSerializable(ARGS_PHOTO_RESOURCES);
         FragmentManager fragmentManager = getChildFragmentManager();
 
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
