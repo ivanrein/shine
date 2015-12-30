@@ -23,17 +23,17 @@ public class PhotosPagerFragment extends Fragment {
     Button mButtonEdit;
     private ViewPager mViewPager;
     public static final String ARGS_PHOTO_RESOURCES = "com.shineapptpa.rei.shine.photosfragment.photos";
-    private ArrayList<Integer> mPhotoResources;
+  //  private ArrayList<Integer> mPhotoResources;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    public static PhotosPagerFragment createInstance(ArrayList<Integer> photoResources)
+    public static PhotosPagerFragment createInstance()
     {
         Bundle args = new Bundle();
-        args.putSerializable(PhotosPagerFragment.ARGS_PHOTO_RESOURCES, photoResources);
+        //args.putSerializable(PhotosPagerFragment.ARGS_PHOTO_RESOURCES, photoResources);
         PhotosPagerFragment fragment = new PhotosPagerFragment();
         fragment.setArguments(args);
         return fragment;

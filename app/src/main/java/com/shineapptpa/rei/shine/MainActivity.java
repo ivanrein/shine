@@ -194,6 +194,9 @@ public class MainActivity extends AppCompatActivity {
                                                 acToken);
                                         ShineUser.resetCurrent();
                                         ShineUser.setCurrentUser(userInfos, schoolInfo);
+                                        if(ShineUser.getCurrentUser() == null){
+                                            Log.d("login-ed", "current user null");
+                                        }else Log.d("login-ed", "current user not null");
                                         Intent i = new Intent(getApplicationContext(),
                                                 HomeActivity.class);
                                         startActivity(i);

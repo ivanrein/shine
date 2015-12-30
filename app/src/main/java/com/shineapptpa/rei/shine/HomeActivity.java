@@ -1,6 +1,7 @@
 package com.shineapptpa.rei.shine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -110,6 +111,21 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 //            mGoogleApiClient.connect();
 //        }
         super.onStart();
+        if(CustomPref.getUserAccessToken(this) == null){
+            LoginManager.getInstance().logOut();
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(i);
+            finish();
+        }
+        if(ShineUser.getCurrentUser() == null){
+            Log.d("onstart home", "currentuser null");
+            ShineUser.fetchCurrentUser(this, new CustomCallback() {
+                @Override
+                public void callback() {
+
+                }
+            });
+        }
     }
 
     @Override
@@ -128,15 +144,29 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         mRelativeLayoutUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = MyProfileActivity.newIntent(
-                        HomeActivity.this,
-                        "Erick Marchelino",
-                        new Date(1995, 3, 17),
-                        "nanannaa",
-                        "Male",
-                        mPhotoResources
-                        );
-                startActivity(intent);
+//                Intent intent = MyProfileActivity.newIntent(
+//                        HomeActivity.this,
+//                        "Erick Marchelino",
+//                        new Date(1995, 3, 17),
+//                        "nanannaa",
+//                        "Male", "contoh@yahoo.com",
+//                        mPhotoResources
+//                        );
+                if(ShineUser.getCurrentUser() != null){
+                    Intent intent = MyProfileActivity.newIntent(HomeActivity.this, ShineUser.getCurrentUser());
+                    startActivity(intent);
+                }else{
+                    if(!ShineUser.fetching){
+                        ShineUser.fetchCurrentUser(getApplicationContext(), new CustomCallback() {
+                            @Override
+                            public void callback() {
+
+                            }
+                        });
+                    }
+                }
+
+
             }
         });
 
