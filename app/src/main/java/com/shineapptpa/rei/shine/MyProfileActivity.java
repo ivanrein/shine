@@ -40,6 +40,14 @@ import java.util.Map;
 
 public class MyProfileActivity extends BaseActivity {
 
+    class GetImages extends AsyncTask<Integer, Void, Bitmap>{
+
+        @Override
+        protected Bitmap doInBackground(Integer... params) {
+            return null;
+        }
+    }
+
     public static final String EXTRA_USER_FULLNAME = "com.shineapptpa.rei.myprofileactivity.fullname";
    // public static final String EXTRA_USER_DOB = "com.shineapptpa.rei.myprofileactivity.dob";
     public static final String EXTRA_USER_GENDER = "com.shineapptpa.rei.myprofileactivity.gender";
@@ -76,21 +84,23 @@ public class MyProfileActivity extends BaseActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-
+                        // di sini mau ngapain abis selesai fetch dari DB pake volley. response itu JSON dari backend isinya
                         try {
                             JSONArray photos= response.getJSONArray("photos");
                             for (int i = 0; i < photos.length(); i++){
-                                // decode base64 dari DB dlu. ni ntar harus dipindahin ke async task
+                                // decode base64 dari DB dlu. yg di dalem for loop ni ntar harus dipindahin ke async task. classnya doank ada bikin di atas sih.
                                 byte[] decodedString = Base64.decode(photos.getJSONObject(i).getString("photo"), Base64.DEFAULT);
                                 // dari byte ke Bitmap
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 options.inJustDecodeBounds = true; // katanya bwt masalah ngecil"in, pake injustdecodebounds true biar ga ditampung memory
                                 BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
-                                // ni insamplesize buat ngecilin gambarnya ceritanya, param 2 sama 3 di calculate itu
-                                // harusnya buat dikecilin jadi seberapa, tapi gw ga bisa tau di sini soalnya
-                                // ukuran ImageViewnya adanya di PhotoFragment. anu'in dulu enaknya gimana.
-                                // method calculate nya ngambil dri web android btw
-                                options.inSampleSize = calculateInSampleSize(options, ?,?);
+
+                                // ni param 2 sama 3 mw dikecilin jd brp gt ukurannya
+                                // gw skrg pake ukuran containernya, soalnya gw liat yg di photofragment
+                                // sama pagerfragmentnya match parent smw jg
+                                options.inSampleSize = calculateInSampleSize(options,
+                                        findViewById(R.id.top_container).getWidth(),
+                                        findViewById(R.id.top_container).getHeight());
                                 options.inJustDecodeBounds = false;
 
                                 //kalo udah beres, baru dimasukin ke photoList, pake bitmapfactory ama options yang baru
@@ -179,12 +189,6 @@ public class MyProfileActivity extends BaseActivity {
 //        return intent;
 //    }
 
-    /**
-     * Create intent and let MyProfileActivity fetch user's photos
-     * @param context
-     * @param user
-     * @return
-     */
     public static Intent newIntent(Context context, HashMap<String, String> userMap ){
         Intent intent = new Intent(context, MyProfileActivity.class);
         intent.putExtra(EXTRA_USER_BIO, userMap.get(ShineUser.MAP_USER_BIO));

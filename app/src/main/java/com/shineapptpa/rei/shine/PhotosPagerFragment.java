@@ -44,7 +44,7 @@ public class PhotosPagerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_photos_pager, container, false);
-        // ni ada yang error" abis pindahan dari yang pake array list integer itu.. harusnya tar dihapus
+        // ni yg error" mau dipindahin jadi pake arraylist bitmap yg di MyProfileActivity hrusnya. ga ngerti caranya gw
         mViewPager = (ViewPager) v.findViewById(R.id.photos_viewpager);
         mPhotoResources = (ArrayList<Integer>) PhotosPagerFragment.this.getArguments().getSerializable(ARGS_PHOTO_RESOURCES);
         FragmentManager fragmentManager = getChildFragmentManager();
