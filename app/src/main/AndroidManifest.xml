@@ -27,10 +27,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+
         </activity>
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -42,21 +39,17 @@
             android:label="@string/title_activity_complete_sign_up">
         </activity>
         <activity android:name=".HomeActivity">
-<<<<<<< HEAD
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".MyProfileActivity"
             android:parentActivityName=".HomeActivity"
             >
-=======
->>>>>>> 58ff352b72b8c8aaadc63b0cf5df97c04dd3117a
         </activity>
-        <activity
-            android:name=".MyProfileActivity"
-            android:parentActivityName=".HomeActivity"
-            >
-        </activity>
-        <service android:name=".NotifPoolService"></service>
+        <!--<service android:name=".NotifPoolService"></service>-->
     </application>
 
 </manifest>

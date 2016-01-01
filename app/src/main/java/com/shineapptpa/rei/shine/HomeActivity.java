@@ -58,27 +58,24 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
     private ArrayList<NavItem> mNavbarItems = new ArrayList<NavItem>();
     private ArrayList<Integer> mPhotoResources;
     private GoogleApiClient mGoogleApiClient;
-    private HashMap<String, String> currUser;
     Location lastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        ShineUser.setCurrentUser();
         setToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mPhotoResources = new ArrayList<Integer>();
-        mPhotoResources.add(R.drawable.dummy_1);
-        mPhotoResources.add(R.drawable.dummy_2);
-        mPhotoResources.add(R.drawable.dummy_6);
-        mPhotoResources.add(R.drawable.dummy_4);
-        mPhotoResources.add(R.drawable.dummy_5);
-        mPhotoResources.add(R.drawable.dummy_5);
         initializeNavbar();
-        setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
-        Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
-        startService(NotifPoolIntent);
+
+        setUser("aa",
+                "Binus University",
+                R.drawable.com_facebook_profile_picture_blank_square);
+
+        //JANGAN LUPA UNCOMMENT
+//        Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
+//        startService(NotifPoolIntent);
     }
 
     private void setUser(String name, String school, int profilePicture)
@@ -87,7 +84,8 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         mTextViewSchool.setText(school);
         mImageViewProfpic.setImageResource(profilePicture);
 
-        currUser = ShineUser.getCurrentUser();
+        
+//        currUser = ShineUser.getCurrentUser();
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayShowTitleEnabled(true); // ini emang di comment
@@ -101,32 +99,30 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 //        }
         Log.d("homeac", "home activity created");
         initializeNavbar();
-
-
     }
 
-    @Override
-    protected void onStart() {
-//        if(lastLocation == null) {
-//            mGoogleApiClient.connect();
+//    @Override
+//    protected void onStart() {
+////        if(lastLocation == null) {
+////            mGoogleApiClient.connect();
+////        }
+//        super.onStart();
+//        if(CustomPref.getUserAccessToken(this) == null){
+//            LoginManager.getInstance().logOut();
+//            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+//            startActivity(i);
+//            finish();
 //        }
-        super.onStart();
-        if(CustomPref.getUserAccessToken(this) == null){
-            LoginManager.getInstance().logOut();
-            Intent i = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(i);
-            finish();
-        }
-        if(ShineUser.getCurrentUser() == null){
-            Log.d("onstart home", "currentuser null");
-            ShineUser.fetchCurrentUser(this, new CustomCallback() {
-                @Override
-                public void callback() {
-
-                }
-            });
-        }
-    }
+//        if(ShineUser.getCurrentUser() == null){
+//            Log.d("onstart home", "currentuser null");
+//            ShineUser.fetchCurrentUser(this, new CustomCallback() {
+//                @Override
+//                public void callback() {
+//
+//                }
+//            });
+//        }
+//    }
 
     @Override
     protected void onStop() {
@@ -144,14 +140,6 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         mRelativeLayoutUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = MyProfileActivity.newIntent(
-//                        HomeActivity.this,
-//                        "Erick Marchelino",
-//                        new Date(1995, 3, 17),
-//                        "nanannaa",
-//                        "Male", "contoh@yahoo.com",
-//                        mPhotoResources
-//                        );
                 if(ShineUser.getCurrentUser() != null){
                     Intent intent = MyProfileActivity.newIntent(HomeActivity.this, ShineUser.getCurrentUser());
                     startActivity(intent);

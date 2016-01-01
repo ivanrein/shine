@@ -58,6 +58,9 @@ public class ShineUser {
         return this.school;
     }
 
+    public ShineUser() {
+    }
+
     public ShineUser(JSONObject userInfos, JSONObject schoolInfo) {
         this.user = new HashMap<>(6);
         this.school = new HashMap<>(6);
@@ -108,8 +111,17 @@ public class ShineUser {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
+    // hapus aja, cuman gw bikin biar ga usah login2an
+    public static void setCurrentUser(){
 
+            currentUser = new HashMap<>();
+            currentUser.put(MAP_USER_EMAIL,"email");
+            currentUser.put(MAP_USER_SCHOOL, "binus");
+            currentUser.put(MAP_USER_GENDER, "Male");
+            currentUser.put(MAP_USER_NAME, "name");
+            currentUser.put(MAP_USER_BIO, "bio");
     }
 
     /**
