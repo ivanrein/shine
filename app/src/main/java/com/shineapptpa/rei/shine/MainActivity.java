@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
         final HashMap<String, String> userInformation = new HashMap<String, String>(6);
         userInformation.put("email", email);
         JSONObject jsonInfo = new JSONObject(userInformation);
-
+        Log.d("yo", jsonInfo.toString());
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST,
                 getString(R.string.laravel_API_url) + "CheckUser", jsonInfo,
                 new Response.Listener<JSONObject>() {

@@ -46,18 +46,18 @@ public class PhotosPagerFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_photos_pager, container, false);
         // ni yg error" mau dipindahin jadi pake arraylist bitmap yg di MyProfileActivity hrusnya. ga ngerti caranya gw
         mViewPager = (ViewPager) v.findViewById(R.id.photos_viewpager);
-        mPhotoResources = (ArrayList<Integer>) PhotosPagerFragment.this.getArguments().getSerializable(ARGS_PHOTO_RESOURCES);
+   //     mPhotoResources = (ArrayList<Integer>) PhotosPagerFragment.this.getArguments().getSerializable(ARGS_PHOTO_RESOURCES);
         FragmentManager fragmentManager = getChildFragmentManager();
 
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
             @Override
             public Fragment getItem(int position) {
-                return PhotoFragment.newInstance(mPhotoResources.get(position));
+                return PhotoFragment.newInstance(0);
             }
 
             @Override
             public int getCount() {
-                return mPhotoResources.size();
+                return 0;
             }
         });
 
@@ -70,10 +70,10 @@ public class PhotosPagerFragment extends Fragment {
                 ((MyProfileActivity)getActivity()).editTextBio.setVisibility(View.VISIBLE);
                 ((MyProfileActivity)getActivity()).mTextViewBio.setVisibility(View.GONE);
 
-                EditPhotosFragment fragment = EditPhotosFragment.createInstance(mPhotoResources);
-                PhotosPagerFragment.this.getFragmentManager().beginTransaction()
-                        .replace(R.id.top_container, fragment)
-                        .commit();
+                //EditPhotosFragment fragment = EditPhotosFragment.createInstance(mPhotoResources);
+//                PhotosPagerFragment.this.getFragmentManager().beginTransaction()
+//                        .replace(R.id.top_container, fragment)
+//                        .commit();
             }
         });
         return v;
