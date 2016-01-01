@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.PersistableBundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -60,15 +61,20 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
     private GoogleApiClient mGoogleApiClient;
     Location lastLocation;
 
+
+    // BRANCH SchoolListActivity
+    private FragmentManager mFragmentManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ShineUser.setCurrentUser();
+        mFragmentManager = getSupportFragmentManager();
         setToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeNavbar();
-
         setUser("aa",
                 "Binus University",
                 R.drawable.com_facebook_profile_picture_blank_square);
@@ -98,7 +104,6 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 //            Log.d("homeac", "google api client is null");
 //        }
         Log.d("homeac", "home activity created");
-        initializeNavbar();
     }
 
 //    @Override
@@ -186,7 +191,7 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
 
         //dummy data
         mNavbarItems.add(new NavItem("MyProfile", "Set your profile setting and more", R.drawable.com_facebook_button_icon));
-        mNavbarItems.add(new NavItem("Coba2", "descccss", R.drawable.com_facebook_button_icon));
+        mNavbarItems.add(new NavItem("Top School", "Best School", R.drawable.com_facebook_button_icon));
         mNavbarItems.add(new NavItem("Logout", "Logout from Shine", R.drawable.com_facebook_button_icon));
         mTextViewUsername.setText("Guest");
         mTextViewUsername.setText("Binus University");
@@ -201,6 +206,13 @@ public class HomeActivity extends BaseActivity implements GoogleApiClient.Connec
         Toast.makeText(HomeActivity.this, mNavbarItems.get(position).getTitle(), Toast.LENGTH_SHORT).show();
         if(position == 0){ // ke myprofile
 
+        }
+        if(position == 1) // ke SchoolListActvity
+        {
+            SchoolListFragment schoolListFragment = SchoolListFragment.createFragment(this);
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, schoolListFragment, "SCHOOL_LIST")
+                    .commit();
         }
         if(position == 2){ // logout
             if(CustomPref.resetAccessToken(getApplicationContext())){

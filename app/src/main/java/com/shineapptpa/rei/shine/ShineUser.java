@@ -58,7 +58,11 @@ public class ShineUser {
         return this.school;
     }
 
-    public ShineUser() {
+    //hapus aja
+    public ShineUser(String name, int rate, String bio) {
+        currentUser = new HashMap<>();
+        currentUser.put(MAP_USER_BIO, bio);
+        currentUser.put(MAP_USER_NAME, name);
     }
 
     public ShineUser(JSONObject userInfos, JSONObject schoolInfo) {

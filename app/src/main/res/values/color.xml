@@ -5,6 +5,10 @@
     <color name="lightPrimary">#CFD8DC</color>
     <color name="white">#FFFFFF</color>
     <color name="accent">#FFC107</color>
+    <color name="red">#FE0E0E</color>
+    <color name="yellow">#FFF40F</color>
+    <color name="blue">#540FFF</color>
+    <color name="green">#00BA0C</color>
     <color name="primaryText">#212121</color>
     <color name="secondText">#727272</color>
     <color name="divider">#B6B6B6</color>

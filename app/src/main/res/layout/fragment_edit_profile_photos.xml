@@ -56,7 +56,6 @@
         app:layout_columnWeight="0.33"
         app:layout_row="1"
         android:elevation="3dp"
-
         app:layout_column="2"
         android:scaleType="fitXY"/>
     <ImageView
