@@ -1,16 +1,16 @@
+
 package com.shineapptpa.rei.shine;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.service.voice.VoiceInteractionSession;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +19,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -26,56 +30,95 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MyProfileActivity extends BaseActivity {
 
-    class GetImages extends AsyncTask<Integer, Void, Bitmap>{
-
-        @Override
-        protected Bitmap doInBackground(Integer... params) {
-            return null;
-        }
-    }
-
     public static final String EXTRA_USER_FULLNAME = "com.shineapptpa.rei.myprofileactivity.fullname";
-   // public static final String EXTRA_USER_DOB = "com.shineapptpa.rei.myprofileactivity.dob";
+    // public static final String EXTRA_USER_DOB = "com.shineapptpa.rei.myprofileactivity.dob";
     public static final String EXTRA_USER_GENDER = "com.shineapptpa.rei.myprofileactivity.gender";
     public static final String EXTRA_USER_BIO = "com.shineapptpa.rei.myprofileactivity.bio";
     public static final String EXTRA_USER_SCHOOL = "com.shineapptpa.rei.myprofileactivity.school";
-   // public static final String EXTRA_USER_IMAGES = "com.shineapptpa.rei.myprofileactivity.images";
+    // public static final String EXTRA_USER_IMAGES = "com.shineapptpa.rei.myprofileactivity.images";
     public static final String EXTRA_USER_EMAIL = "com.shineapptpa.rei.myprofileactivity.email";
     private FragmentManager mFragmentManager;
     private Fragment mFragment;
     public TextView mTextViewBio, mTextViewAge, mTextViewUser, mTextViewSchool;
     public EditText editTextBio;
+    int container_height, container_width;
     ImageView mImageViewGender;
-
-  //  ArrayList<Integer> photoResources;
     ArrayList<Bitmap> photoList;
+    int total_loaded_images = 0;
+
+    class GetImages extends AsyncTask<String, Void, Bitmap>{
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            byte[] decodedString = null;
+            decodedString = Base64.decode(params[0], Base64.DEFAULT);
+
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
+            options.inSampleSize = calculateInSampleSize(options,
+                    container_width,
+                    container_height);
+            options.inJustDecodeBounds = false;
+            Log.d("processing image", "processing image" + total_loaded_images);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            photoList.add(bitmap);
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap aVoid) {
+            Log.d("changing image", total_loaded_images+"");
+            ImageView temp = ((ImageView) ((PhotosPagerFragment) mFragmentManager.findFragmentByTag("PAGER"))
+                    .getViewPager().findViewWithTag("POSITION" + total_loaded_images));
+            if(temp!=null)
+                temp.setImageBitmap(aVoid);
+            total_loaded_images++;
+        }
+    }
+
+    public ArrayList<Bitmap> getPhotoList()
+    {
+        return this.photoList;
+    }
+
+    public Bitmap getPhoto(int position)
+    {
+        if(photoList.size() == 0 || position > photoList.size()-1)
+            return BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_square);
+        else
+            return this.photoList.get(position);
+    }
+
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        container_height = findViewById(R.id.top_container).getMeasuredHeight();
+        container_width = findViewById(R.id.top_container).getMeasuredWidth();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
         setToolbar();
         getSupportActionBar().hide();
+
         mFragmentManager = getSupportFragmentManager();
         mFragment = mFragmentManager.findFragmentById(R.id.top_container);
 
         initialize();
         bindView();
 
-        //fetch foto dari db
         RequestQueue q = Volley.newRequestQueue(this);
         HashMap<String, String> email = new HashMap<>();
         email.put("email", (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL));
@@ -84,38 +127,25 @@ public class MyProfileActivity extends BaseActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // di sini mau ngapain abis selesai fetch dari DB pake volley. response itu JSON dari backend isinya
                         try {
+
+                        	//Jangan lupa, ganti ip address sama structure json nya sesuain sama punya lu, 
+                        	//ini gw bikin routes sendiri soalnya
                             JSONArray photos= response.getJSONArray("photos");
+
                             for (int i = 0; i < photos.length(); i++){
-                                // decode base64 dari DB dlu. yg di dalem for loop ni ntar harus dipindahin ke async task. classnya doank ada bikin di atas sih.
-                                byte[] decodedString = Base64.decode(photos.getJSONObject(i).getString("photo"), Base64.DEFAULT);
-                                // dari byte ke Bitmap
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inJustDecodeBounds = true; // katanya bwt masalah ngecil"in, pake injustdecodebounds true biar ga ditampung memory
-                                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
-
-                                // ni param 2 sama 3 mw dikecilin jd brp gt ukurannya
-                                // gw skrg pake ukuran containernya, soalnya gw liat yg di photofragment
-                                // sama pagerfragmentnya match parent smw jg
-                                options.inSampleSize = calculateInSampleSize(options,
-                                        findViewById(R.id.top_container).getWidth(),
-                                        findViewById(R.id.top_container).getHeight());
-                                options.inJustDecodeBounds = false;
-
-                                //kalo udah beres, baru dimasukin ke photoList, pake bitmapfactory ama options yang baru
-                                photoList.add(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options));
+                                Log.d("dapet image", ""+i);
+                                new GetImages().execute(photos.getJSONObject(i).getString("photo"));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.d("ERROR", error.getLocalizedMessage());
                     }
                 }){
             @Override
@@ -131,7 +161,7 @@ public class MyProfileActivity extends BaseActivity {
         PhotosPagerFragment temp = PhotosPagerFragment.createInstance();
         if(mFragmentManager.getFragments() == null)
             mFragmentManager.beginTransaction()
-                    .add(R.id.top_container, temp)
+                    .add(R.id.top_container, temp, "PAGER")
                     .addToBackStack(null)
                     .commit();
 
@@ -146,7 +176,6 @@ public class MyProfileActivity extends BaseActivity {
         mTextViewBio = (TextView) findViewById(R.id.tvBio);
         editTextBio = (EditText) findViewById(R.id.tvBioEdit);
         photoList = new ArrayList<>();
- //       photoResources = new ArrayList<Integer>();
     }
 
     @Override
@@ -163,31 +192,17 @@ public class MyProfileActivity extends BaseActivity {
         String gender =(String) getIntent().getSerializableExtra(EXTRA_USER_GENDER);
         String bio =(String) getIntent().getSerializableExtra(EXTRA_USER_BIO);
         String school =(String) getIntent().getSerializableExtra(EXTRA_USER_SCHOOL);
-     //   photoResources = (ArrayList<Integer>) getIntent().getSerializableExtra(EXTRA_USER_IMAGES);
 
 //        Calendar today = Calendar.getInstance();
 //        Integer age = today.get(Calendar.YEAR) - dob.getYear();
 //        mTextViewAge.setText(age.toString());
+
         mTextViewUser.setText(fullname);
         mTextViewSchool.setText(school);
         mImageViewGender.setImageResource(gender.equals("Male") ? R.drawable.gentleman : R.drawable.ladies);
         mTextViewBio.setText(bio);
         editTextBio.setText(bio);
     }
-
-    //pake intent ini buat bikin intent ke MyProfile
-//    public static Intent newIntent(Context context, String fullname, Date dob, String bio,
-//                                   String gender, String email, ArrayList<Integer> resources)
-//    {
-//        Intent intent = new Intent(context, MyProfileActivity.class);
-//        intent.putExtra(EXTRA_USER_FULLNAME, fullname);
-//        intent.putExtra(EXTRA_USER_DOB, dob);
-//        intent.putExtra(EXTRA_USER_BIO, bio);
-//        intent.putExtra(EXTRA_USER_GENDER, gender);
-//        intent.putExtra(EXTRA_USER_IMAGES, resources);
-//        intent.putExtra(EXTRA_USER_EMAIL, email);
-//        return intent;
-//    }
 
     public static Intent newIntent(Context context, HashMap<String, String> userMap ){
         Intent intent = new Intent(context, MyProfileActivity.class);
@@ -208,28 +223,19 @@ public class MyProfileActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Toast.makeText(MyProfileActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
-
         switch(item.getItemId()) {
             case R.id.action_done: {
                 //SAVE PROFILE HABIS EDIT DI SINI, SAVE KE API, DLL
-
                 mTextViewBio.setText(editTextBio.getText().toString());
-                EditPhotosFragment temp = (EditPhotosFragment) mFragmentManager.
-                        findFragmentById(R.id.top_container);
-
-      //          photoResources = temp.getPhotoResources();
+                photoList = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getPhotoResources();
 
             }
             break;
+            case R.id.action_cancel: {
+                editTextBio.setText(mTextViewBio.getText().toString());
 
-//            case R.id.action_cancel: {
-//                mTextViewBio.setText(editTextBio.getText().toString());
-//                EditPhotosFragment temp = (EditPhotosFragment) mFragmentManager.
-//                        findFragmentById(R.id.top_container);
-//
-//                photoResources = temp.getNotEdited();
-//            }
-//            break;
+            }
+            break;
         }
 
         mTextViewBio.setVisibility(View.VISIBLE);
@@ -237,7 +243,7 @@ public class MyProfileActivity extends BaseActivity {
 
         PhotosPagerFragment fragment = PhotosPagerFragment.createInstance();
         mFragmentManager.beginTransaction()
-                .replace(R.id.top_container, fragment)
+                .replace(R.id.top_container, fragment, "PAGER")
                 .commit();
 
         return super.onOptionsItemSelected(item);
@@ -254,9 +260,6 @@ public class MyProfileActivity extends BaseActivity {
 
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
             while ((halfHeight / inSampleSize) > reqHeight
                     && (halfWidth / inSampleSize) > reqWidth) {
                 inSampleSize *= 2;
@@ -264,5 +267,40 @@ public class MyProfileActivity extends BaseActivity {
         }
 
         return inSampleSize;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("Image", "" + requestCode + " " + resultCode);
+        Log.d("Image", "" + EditPhotosFragment.GET_PHOTO + " " + RESULT_OK);
+        if (resultCode == RESULT_OK) {
+            if (data == null) {
+                return;
+            }
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                bitmap = Bitmap.createScaledBitmap(bitmap, container_width, container_height, true);
+                photoList.add(bitmap);
+
+                EditPhotosFragment tempFragment = (EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT");
+                tempFragment.refreshPhotos(photoList);
+
+                for (int i = 0; i < 5; i++)
+                {
+                    ImageView temp = ((ImageView) ((PhotosPagerFragment) mFragmentManager.findFragmentByTag("PAGER"))
+                            .getViewPager().findViewWithTag("POSITION" + i));
+                    if(temp!=null)
+                        temp.setImageBitmap(photoList.get(i));
+                }
+
+                Log.d("Image", inputStream.toString());
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
     }
 }

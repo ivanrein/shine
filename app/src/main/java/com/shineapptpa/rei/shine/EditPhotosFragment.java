@@ -1,10 +1,14 @@
+
 package com.shineapptpa.rei.shine;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +22,16 @@ import java.util.Objects;
  */
 public class EditPhotosFragment extends Fragment {
 
-    public static final String ARGS_PHOTO_RESOURCES = "com.shineapptpa.rei.shine.editphotoresources.photos";
-    ArrayList<Integer> mPhotoResources;
-    ArrayList<Integer> mNotEdited;
+    ArrayList<Bitmap> mPhotoResources;
     ArrayList<ImageView> mPhotoHolder;
     ImageView mPhoto0, mPhoto1, mPhoto2, mPhoto3, mPhoto4, mPhoto5;
-    final int EMPTY  = R.drawable.com_facebook_profile_picture_blank_square;
+    final String NOT_EMPTY = "not_empty";
+    final String EMPTY = "empty";
+    public static final int GET_PHOTO = 177;
 
-    public ArrayList<Integer> getPhotoResources()
+    public ArrayList<Bitmap> getPhotoResources()
     {
-        return mPhotoResources;
+        return this.mPhotoResources;
     }
 
     @Override
@@ -35,18 +39,12 @@ public class EditPhotosFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public ArrayList<Integer> getNotEdited()
-    {
-        return mNotEdited;
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_edit_profile_photos, container, false);
 
-        mPhotoResources = (ArrayList<Integer>) getArguments().getSerializable(ARGS_PHOTO_RESOURCES);
-        mNotEdited = mPhotoResources;
+        mPhotoResources = ((MyProfileActivity)getActivity()).getPhotoList();
 
         mPhoto0 = (ImageView) v.findViewById(R.id.ivUser0);
         mPhoto1 = (ImageView) v.findViewById(R.id.ivUser1);
@@ -72,17 +70,26 @@ public class EditPhotosFragment extends Fragment {
                 @Override
                 public boolean onLongClick(View v) {
                     int position = mPhotoHolder.indexOf((ImageView) v);
-                    if (!mPhotoHolder.get(position).getDrawable().getConstantState()
-                            .equals(
-                            getResources()
-                                    .getDrawable(R.drawable.com_facebook_profile_picture_blank_square)
-                                    .getConstantState()
-                            )
-                            ) {
+                    if (mPhotoHolder.get(position).getTag().equals(NOT_EMPTY))
+                    {
                         mPhotoResources.remove(position);
                         refreshHolders();
+                        Log.d("PHOTOLONGCLICKED", "NOT_EMPTY");
                     }
                     return false;
+                }
+            });
+
+            mPhotoHolder.get(j).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = mPhotoHolder.indexOf((ImageView) v);
+                    if (mPhotoHolder.get(position).getTag().equals(EMPTY))
+                    {
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("image/*");
+                        startActivityForResult(intent, GET_PHOTO);
+                    }
                 }
             });
         }
@@ -97,25 +104,27 @@ public class EditPhotosFragment extends Fragment {
         int i;
         for (i = 0; i < mPhotoResources.size(); i++)
         {
-            mPhotoHolder.get(i).setImageResource(mPhotoResources.get(i));
+            mPhotoHolder.get(i).setImageBitmap(mPhotoResources.get(i));
+            mPhotoHolder.get(i).setTag(NOT_EMPTY);
         }
 
         for (int j = i; j < mPhotoHolder.size(); j++)
         {
             mPhotoHolder.get(j).setImageResource(R.drawable.com_facebook_profile_picture_blank_square);
+            mPhotoHolder.get(i).setTag(EMPTY);
+
         }
     }
 
-    public static EditPhotosFragment createInstance(ArrayList<Integer> photoResources)
+    public void refreshPhotos(ArrayList<Bitmap> resources)
     {
-        Bundle args = new Bundle();
-        args.putSerializable(EditPhotosFragment.ARGS_PHOTO_RESOURCES, photoResources);
-        EditPhotosFragment fragment = new EditPhotosFragment();
-        fragment.setArguments(args);
-        return fragment;
+        this.mPhotoResources = resources;
+        refreshHolders();
     }
 
-
-
-
+    public static EditPhotosFragment createInstance()
+    {
+        EditPhotosFragment fragment = new EditPhotosFragment();
+        return fragment;
+    }
 }
