@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="facebook_app_id">943213372428997</string>
     <string name="title_activity_complete_sign_up">CompleteSignUpActivity</string>
-    <string name="laravel_API_url">http://128.199.90.47/</string>
+    <string name="laravel_API_url">http://10.0.3.2/backendTPA/public/</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="navbar_open">open_navbar</string>
     <string name="navbar_close">close_navbar</string>
