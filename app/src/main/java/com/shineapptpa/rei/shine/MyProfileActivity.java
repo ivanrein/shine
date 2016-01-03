@@ -138,6 +138,7 @@ public class MyProfileActivity extends BaseActivity {
 
                             for (int i = 0; i < photos.length(); i++){
                                 Log.d("dapet image", ""+i);
+                                Log.d("dapet image", photos.getJSONObject(i).getString("photo"));
                                 new GetImages().execute(photos.getJSONObject(i).getString("photo"));
                             }
                         } catch (JSONException e) {
@@ -311,6 +312,7 @@ public class MyProfileActivity extends BaseActivity {
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 bitmap = Bitmap.createScaledBitmap(bitmap, container_width, container_height, true);
                 photoList.add(bitmap);
+                savePhoto(bitmap);
                 EditPhotosFragment tempFragment = (EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT");
                 tempFragment.refreshPhotos(photoList);
 
@@ -334,9 +336,21 @@ public class MyProfileActivity extends BaseActivity {
 
     private void savePhoto(final Bitmap bitmap){
         RequestQueue qUploadFoto = Volley.newRequestQueue(this);
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 10, byteOutput);
+        byte[] b = byteOutput.toByteArray();
+        HashMap<String, String> photo = new HashMap<>();
 
+        photo.put("photo", Base64.encodeToString(b, Base64.DEFAULT));
+        Log.d("fotonya kak", photo.get("photo"));
+        JSONObject photoJson = new JSONObject(photo);
+        try {
+            Log.d("fotonya json", photoJson.getString("photo"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
-                getString(R.string.laravel_API_url) + "SavePhoto", null,
+                getString(R.string.laravel_API_url) + "SavePhoto", photoJson,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
