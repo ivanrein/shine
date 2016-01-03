@@ -1,3 +1,4 @@
+
 package com.shineapptpa.rei.shine;
 
 import android.Manifest;
@@ -388,6 +389,7 @@ public class HomeActivity extends BaseActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("vote", response.toString());
+                        Toast.makeText(HomeActivity.this, "Vote success", Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener() {
@@ -406,5 +408,6 @@ public class HomeActivity extends BaseActivity {
         queue.add(req);
 
     }
+
 
 }

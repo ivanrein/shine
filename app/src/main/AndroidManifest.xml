@@ -42,7 +42,6 @@
             android:label="@string/title_activity_complete_sign_up">
         </activity>
         <activity android:name=".HomeActivity">
-
         </activity>
         <activity
             android:name=".MyProfileActivity"
@@ -53,3 +52,4 @@
     </application>
 
 </manifest>
+

@@ -12,8 +12,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -21,14 +32,20 @@ import java.util.Objects;
  */
 public class EditPhotosFragment extends Fragment {
 
-    ArrayList<Bitmap> mPhotoResources;
+    ArrayList<Photo> mPhotoResources;
     ArrayList<ImageView> mPhotoHolder;
+    ArrayList<String> deletedPhotosId;
     ImageView mPhoto0, mPhoto1, mPhoto2, mPhoto3, mPhoto4, mPhoto5;
     final String NOT_EMPTY = "not_empty";
     final String EMPTY = "empty";
     public static final int GET_PHOTO = 177;
 
-    public ArrayList<Bitmap> getPhotoResources()
+    public ArrayList<String> getDeletedPhotosId()
+    {
+        return this.deletedPhotosId;
+    }
+
+    public ArrayList<Photo> getPhotoResources()
     {
         return this.mPhotoResources;
     }
@@ -53,6 +70,7 @@ public class EditPhotosFragment extends Fragment {
         mPhoto5 = (ImageView) v.findViewById(R.id.ivUser5);
 
         mPhotoHolder = new ArrayList<ImageView>();
+        deletedPhotosId = new ArrayList<String>();
 
         mPhotoHolder.add(mPhoto0);
         mPhotoHolder.add(mPhoto1);
@@ -71,9 +89,15 @@ public class EditPhotosFragment extends Fragment {
                     int position = mPhotoHolder.indexOf((ImageView) v);
                     if (mPhotoHolder.get(position).getTag().equals(NOT_EMPTY))
                     {
+                        deletedPhotosId.add(mPhotoResources.get(position).getPhotoId());
+                        deletePhoto(mPhotoResources.get(position).getPhotoId());
                         mPhotoResources.remove(position);
                         refreshHolders();
                         Log.d("PHOTOLONGCLICKED", "NOT_EMPTY");
+                        Log.d("PHOTOLONGCLICKED", "position: " +position);
+                        Log.d("PHOTOLONGCLICKED", "mPhotoResourceSize: " + mPhotoResources.size());
+                        Log.d("PHOTOLONGCLICKED", "NOT_EMPTY");
+
                     }
                     return false;
                 }
@@ -98,12 +122,34 @@ public class EditPhotosFragment extends Fragment {
         return v;
     }
 
+    private void deletePhoto(String photoId) {
+        RequestQueue delQue = Volley.newRequestQueue(getContext());
+        HashMap<String, String> photoIdMap = new HashMap<>();
+        photoIdMap.put("id", photoId);
+        JSONObject json = new JSONObject(photoIdMap);
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST,
+                getString(R.string.laravel_API_url) + "DeletePhoto", json,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(getContext(), "Photo deleted", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getContext(), "Delete failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        delQue.add(req);
+    }
+
     private void refreshHolders()
     {
         int i;
         for (i = 0; i < mPhotoResources.size(); i++)
         {
-            mPhotoHolder.get(i).setImageBitmap(mPhotoResources.get(i));
+            mPhotoHolder.get(i).setImageBitmap(mPhotoResources.get(i).getBitmap());
             mPhotoHolder.get(i).setTag(NOT_EMPTY);
         }
 
@@ -115,7 +161,7 @@ public class EditPhotosFragment extends Fragment {
         }
     }
 
-    public void refreshPhotos(ArrayList<Bitmap> resources)
+    public void refreshPhotos(ArrayList<Photo> resources)
     {
         this.mPhotoResources = resources;
         refreshHolders();

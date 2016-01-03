@@ -1,3 +1,4 @@
+
 package com.shineapptpa.rei.shine;
 
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -29,6 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,8 +52,9 @@ public class MyProfileActivity extends BaseActivity {
     public TextView mTextViewBio, mTextViewAge, mTextViewUser, mTextViewSchool;
     public EditText editTextBio;
     int container_height, container_width;
+    String new_photo_id = "";
     ImageView mImageViewGender;
-    ArrayList<Bitmap> photoList;
+    ArrayList<Photo> photoList;
     int total_loaded_images = 0;
 
     class GetImages extends AsyncTask<String, Void, Bitmap>{
@@ -70,7 +74,8 @@ public class MyProfileActivity extends BaseActivity {
             options.inJustDecodeBounds = false;
             Log.d("processing image", "processing image" + total_loaded_images);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-            photoList.add(bitmap);
+            photoList.add(new Photo(params[1]));
+            photoList.get(photoList.size()-1).setBitmap(bitmap);
             return bitmap;
         }
 
@@ -85,7 +90,7 @@ public class MyProfileActivity extends BaseActivity {
         }
     }
 
-    public ArrayList<Bitmap> getPhotoList()
+    public ArrayList<Photo> getPhotoList()
     {
         return this.photoList;
     }
@@ -95,8 +100,9 @@ public class MyProfileActivity extends BaseActivity {
         if(photoList.size() == 0 || position > photoList.size()-1)
             return BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_square);
         else
-            return this.photoList.get(position);
+            return this.photoList.get(position).getBitmap();
     }
+
 
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -118,10 +124,10 @@ public class MyProfileActivity extends BaseActivity {
         bindView();
 
         RequestQueue q = Volley.newRequestQueue(this);
-        HashMap<String, String> email = new HashMap<>();
-        email.put("email", (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL));
-        JSONObject json = new JSONObject(email);
-        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos", json,
+
+        String email = (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL);
+
+        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos?email="+email, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -132,9 +138,13 @@ public class MyProfileActivity extends BaseActivity {
                             JSONArray photos= response.getJSONArray("photos");
 
                             for (int i = 0; i < photos.length(); i++){
-                                Log.d("dapet image", ""+i);
-                                new GetImages().execute(photos.getJSONObject(i).getString("photo"));
+
+                                Log.d("dapet image", photos.getJSONObject(i).getString("id"));
+
+                                new GetImages().execute(photos.getJSONObject(i).getString("photo"),photos.getJSONObject(i).getString("id"));
                             }
+
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -224,9 +234,46 @@ public class MyProfileActivity extends BaseActivity {
         switch(item.getItemId()) {
             case R.id.action_done: {
                 //SAVE PROFILE HABIS EDIT DI SINI, SAVE KE API, DLL
+                ArrayList<String> deletedPhotosId = new ArrayList<>();
+
+                //ini id yg mau dihapus
+                deletedPhotosId = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getDeletedPhotosId();
+
                 mTextViewBio.setText(editTextBio.getText().toString());
                 photoList = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getPhotoResources();
 
+                HashMap<String, String> bioBaru = new HashMap<String, String>();
+                bioBaru.put("bio", editTextBio.getText().toString());
+                JSONObject postBio = new JSONObject(bioBaru);
+                RequestQueue que = Volley.newRequestQueue(getApplicationContext());
+                JsonObjectRequest updateBioRequest = new JsonObjectRequest(Request.Method.POST,
+                        getString(R.string.laravel_API_url) + "update", postBio,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Toast.makeText(MyProfileActivity.this, "Update success", Toast.LENGTH_SHORT).show();
+                                try {
+                                    ShineUser.updateCurrentUser(ShineUser.MAP_USER_BIO,
+                                            response.getJSONObject("user").getString("bio"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(MyProfileActivity.this, "Connection error", Toast.LENGTH_SHORT).show();
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> params = new HashMap<>();
+                        params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
+                        return params;
+                    }
+                };
+                que.add(updateBioRequest);
             }
             break;
             case R.id.action_cancel: {
@@ -247,6 +294,30 @@ public class MyProfileActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void deletePhoto(ArrayList<String> deletedPhotosId) {
+
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("Image", "" + requestCode + " " + resultCode);
@@ -259,7 +330,8 @@ public class MyProfileActivity extends BaseActivity {
                 InputStream inputStream = getContentResolver().openInputStream(data.getData());
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 bitmap = Bitmap.createScaledBitmap(bitmap, container_width, container_height, true);
-                photoList.add(bitmap);
+                photoList.add(new Photo(bitmap));
+                savePhoto(bitmap);
 
                 EditPhotosFragment tempFragment = (EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT");
                 tempFragment.refreshPhotos(photoList);
@@ -270,7 +342,7 @@ public class MyProfileActivity extends BaseActivity {
                     ImageView temp = ((ImageView) ((PhotosPagerFragment) mFragmentManager.findFragmentByTag("PAGER"))
                             .getViewPager().findViewWithTag("POSITION" + i));
                     if(temp!=null)
-                        temp.setImageBitmap(photoList.get(i));
+                        temp.setImageBitmap(photoList.get(i).getBitmap());
                 }
 
                 Log.d("Image", inputStream.toString());
@@ -282,4 +354,59 @@ public class MyProfileActivity extends BaseActivity {
 
         }
     }
+
+
+    private void savePhoto(final Bitmap bitmap){
+        RequestQueue qUploadFoto = Volley.newRequestQueue(this);
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 10, byteOutput);
+        byte[] b = byteOutput.toByteArray();
+        HashMap<String, String> photo = new HashMap<>();
+
+        photo.put("photo", Base64.encodeToString(b, Base64.DEFAULT));
+        Log.d("fotonya kak", photo.get("photo"));
+        JSONObject photoJson = new JSONObject(photo);
+        try {
+            Log.d("fotonya json", photoJson.getString("photo"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                getString(R.string.laravel_API_url) + "SavePhoto", photoJson,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(response.getString("result").equals("success")) {
+                                Toast.makeText(MyProfileActivity.this,
+                                        "Photo successfully uploaded", Toast.LENGTH_SHORT).show();
+                                new_photo_id = response.getString("photo");
+                                photoList.get(photoList.size()-1).setPhotoId(new_photo_id);
+                            }
+                            else{
+                                Toast.makeText(MyProfileActivity.this,
+                                        "There were some errors", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MyProfileActivity.this, error.toString(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
+                return params;
+            }
+        };
+        qUploadFoto.add(request);
+    }
 }
+

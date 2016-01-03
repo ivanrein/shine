@@ -1,3 +1,4 @@
+
 package com.shineapptpa.rei.shine;
 
 import android.content.Context;
@@ -95,13 +96,9 @@ public class ShineUser {
         currentUser = null;
     }
 
-    public static void setCurrentUser(){
-            currentUser = new HashMap<>(6);
-            currentUser.put(MAP_USER_EMAIL,"email");
-            currentUser.put(MAP_USER_GENDER, "gender");
-            currentUser.put(MAP_USER_NAME, "name");
-            currentUser.put(MAP_USER_BIO, "bio");
-            currentUser.put(MAP_SCHOOL_NAME, "sekolah");
+
+    public static void updateCurrentUser(String key, String value){
+        currentUser.put(key, value);
     }
 
     public static void setCurrentUser(JSONObject userInfos, JSONObject schoolInfo){
@@ -126,6 +123,8 @@ public class ShineUser {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
     }
 
     /**
