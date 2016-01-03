@@ -75,7 +75,8 @@ public class MyProfileActivity extends BaseActivity {
             options.inJustDecodeBounds = false;
             Log.d("processing image", "processing image" + total_loaded_images);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-            photoList.get(total_loaded_images).setBitmap(bitmap);
+            photoList.add(new Photo(params[1]));
+            photoList.get(photoList.size()-1).setBitmap(bitmap);
             return bitmap;
         }
 
@@ -138,16 +139,13 @@ public class MyProfileActivity extends BaseActivity {
                             JSONArray photos= response.getJSONArray("photos");
 
                             for (int i = 0; i < photos.length(); i++){
-                                Log.d("dapet image", ""+i);
-                                Log.d("dapet image", photos.getJSONObject(i).getString("photo"));
-                                new GetImages().execute(photos.getJSONObject(i).getString("photo"));
+
+                                Log.d("dapet image", photos.getJSONObject(i).getString("id"));
+
+                                new GetImages().execute(photos.getJSONObject(i).getString("photo"),photos.getJSONObject(i).getString("id"));
                             }
 
-                            //ini idnya dapetnya gimana gw gatau arraynya
-                            JSONArray id= response.getJSONArray("id");
-                            for (int i = 0; i < id.length(); i++){
-                                photoList.add(new Photo(id.getJSONObject(i).getString("id")));
-                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -242,7 +240,6 @@ public class MyProfileActivity extends BaseActivity {
                 //ini id yg mau dihapus
                 deletedPhotosId = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getDeletedPhotosId();
 
-
                 mTextViewBio.setText(editTextBio.getText().toString());
                 photoList = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getPhotoResources();
 
@@ -256,6 +253,12 @@ public class MyProfileActivity extends BaseActivity {
                             @Override
                             public void onResponse(JSONObject response) {
                                 Toast.makeText(MyProfileActivity.this, "Update success", Toast.LENGTH_SHORT).show();
+                                try {
+                                    ShineUser.updateCurrentUser(ShineUser.MAP_USER_BIO,
+                                            response.getJSONObject("user").getString("bio"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         },
                         new Response.ErrorListener() {
@@ -290,6 +293,10 @@ public class MyProfileActivity extends BaseActivity {
                 .commit();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deletePhoto(ArrayList<String> deletedPhotosId) {
+
     }
 
     public static int calculateInSampleSize(

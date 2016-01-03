@@ -85,7 +85,9 @@ public class ShineUser {
     }
 
 
-
+    public static void updateCurrentUser(String key, String value){
+        currentUser.put(key, value);
+    }
 
     public static void setCurrentUser(JSONObject userInfos, JSONObject schoolInfo){
         if(currentUser == null)

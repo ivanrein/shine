@@ -13,8 +13,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -80,9 +91,14 @@ public class EditPhotosFragment extends Fragment {
                     if (mPhotoHolder.get(position).getTag().equals(NOT_EMPTY))
                     {
                         deletedPhotosId.add(mPhotoResources.get(position).getPhotoId());
+                        deletePhoto(mPhotoResources.get(position).getPhotoId());
                         mPhotoResources.remove(position);
                         refreshHolders();
                         Log.d("PHOTOLONGCLICKED", "NOT_EMPTY");
+                        Log.d("PHOTOLONGCLICKED", "position: " +position);
+                        Log.d("PHOTOLONGCLICKED", "mPhotoResourceSize: " + mPhotoResources.size());
+                        Log.d("PHOTOLONGCLICKED", "NOT_EMPTY");
+
                     }
                     return false;
                 }
@@ -105,6 +121,28 @@ public class EditPhotosFragment extends Fragment {
         ((MyProfileActivity) this.getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(true);
         ((MyProfileActivity) this.getActivity()).getSupportActionBar().show();
         return v;
+    }
+
+    private void deletePhoto(String photoId) {
+        RequestQueue delQue = Volley.newRequestQueue(getContext());
+        HashMap<String, String> photoIdMap = new HashMap<>();
+        photoIdMap.put("id", photoId);
+        JSONObject json = new JSONObject(photoIdMap);
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST,
+                getString(R.string.laravel_API_url) + "DeletePhoto", json,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(getContext(), "Photo deleted", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getContext(), "Delete failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        delQue.add(req);
     }
 
     private void refreshHolders()
