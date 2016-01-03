@@ -179,8 +179,7 @@ public class HomeActivity extends BaseActivity {
         mTextViewSchool.setText(school);
         mImageViewProfpic.setImageResource(profilePicture);
 
-        
-//        currUser = ShineUser.getCurrentUser();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayShowTitleEnabled(true); // ini emang di comment

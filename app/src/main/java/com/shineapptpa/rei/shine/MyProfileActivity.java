@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -30,6 +31,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.ads.mediation.customevent.CustomEventServerParameters;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -120,10 +123,10 @@ public class MyProfileActivity extends BaseActivity {
         bindView();
 
         RequestQueue q = Volley.newRequestQueue(this);
-        HashMap<String, String> email = new HashMap<>();
-        email.put("email", (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL));
-        JSONObject json = new JSONObject(email);
-        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos", json,
+
+        String email = (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL);
+
+        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos?email="+email, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -229,6 +232,32 @@ public class MyProfileActivity extends BaseActivity {
                 mTextViewBio.setText(editTextBio.getText().toString());
                 photoList = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getPhotoResources();
 
+                HashMap<String, String> bioBaru = new HashMap<String, String>();
+                bioBaru.put("bio", editTextBio.getText().toString());
+                JSONObject postBio = new JSONObject(bioBaru);
+                RequestQueue que = Volley.newRequestQueue(getApplicationContext());
+                JsonObjectRequest updateBioRequest = new JsonObjectRequest(Request.Method.POST,
+                        getString(R.string.laravel_API_url) + "update", postBio,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Toast.makeText(MyProfileActivity.this, "Update success", Toast.LENGTH_SHORT).show();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(MyProfileActivity.this, "Connection error", Toast.LENGTH_SHORT).show();
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> params = new HashMap<>();
+                        params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
+                        return params;
+                    }
+                };
+                que.add(updateBioRequest);
             }
             break;
             case R.id.action_cancel: {
@@ -282,7 +311,6 @@ public class MyProfileActivity extends BaseActivity {
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 bitmap = Bitmap.createScaledBitmap(bitmap, container_width, container_height, true);
                 photoList.add(bitmap);
-
                 EditPhotosFragment tempFragment = (EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT");
                 tempFragment.refreshPhotos(photoList);
 
@@ -302,5 +330,43 @@ public class MyProfileActivity extends BaseActivity {
             }
 
         }
+    }
+
+    private void savePhoto(final Bitmap bitmap){
+        RequestQueue qUploadFoto = Volley.newRequestQueue(this);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                getString(R.string.laravel_API_url) + "SavePhoto", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(response.getString("result").equals("success"))
+                                Toast.makeText(MyProfileActivity.this,
+                                        "Photo successfully uploaded", Toast.LENGTH_SHORT).show();
+                            else{
+                                Toast.makeText(MyProfileActivity.this,
+                                        "There were some errors", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MyProfileActivity.this, error.toString(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
+                return params;
+            }
+        };
+        qUploadFoto.add(request);
     }
 }
