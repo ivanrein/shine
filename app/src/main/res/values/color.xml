@@ -12,4 +12,14 @@
     <color name="primaryText">#212121</color>
     <color name="secondText">#727272</color>
     <color name="divider">#B6B6B6</color>
+    <color name="one">#FF1100</color>
+    <color name="two">#FF2E00</color>
+    <color name="three">#FF4900</color>
+    <color name="four">#FF5100</color>
+    <color name="five">#FF7500</color>
+    <color name="six">#FFA000</color>
+    <color name="seven">#FFB500</color>
+    <color name="eight">#FFCE00</color>
+    <color name="nine">#FFE000</color>
+    <color name="ten">#FFFB00</color>
 </resources>

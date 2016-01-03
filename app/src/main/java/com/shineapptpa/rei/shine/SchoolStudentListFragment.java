@@ -64,7 +64,7 @@ public class SchoolStudentListFragment extends Fragment {
         List<ShineUser> mShineUsers = new ArrayList<ShineUser>();
         for (int i = 0; i < 25; i++)
         {
-            mShineUsers.add(new ShineUser("User "+i, 9, "ngentodss"));
+            mShineUsers.add(new ShineUser("a","a","a","a","a"));
         }
 
         mStudentAdapter = new ShineUserAdapter(mShineUsers);

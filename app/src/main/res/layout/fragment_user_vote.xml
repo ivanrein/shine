@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+                android:layout_margin="10dp">
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:id="@+id/ivUserGender"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/tvUserSchool"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="22dp"/>
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="250dp"
+        android:id="@+id/ivUserPhoto"
+        android:layout_below="@+id/ivUserGender"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/tvUserVoteName"
+        android:layout_below="@+id/ivUserPhoto"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"/>
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvUserVoteName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:text="1"
+                android:background="@color/one"
+                android:id="@+id/btn1"
+                android:layout_column="0"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/two"
+                android:text="2"
+                android:id="@+id/btn2"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/three"
+                android:text="3"
+                android:id="@+id/btn3"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/four"
+                android:text="4"
+                android:id="@+id/btn4"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/five"
+                android:text="5"
+                android:id="@+id/btn5"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:text="6"
+                android:background="@color/six"
+                android:id="@+id/btn6"
+                android:layout_column="0"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/seven"
+                android:text="7"
+                android:id="@+id/btn7"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/eight"
+                android:text="8"
+                android:id="@+id/btn8"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/nine"
+                android:text="9"
+                android:id="@+id/btn9"/>
+
+            <Button
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:background="@color/ten"
+                android:text="10"
+                android:id="@+id/btn10"/>
+        </TableRow>
+    </TableLayout>
+</RelativeLayout>
