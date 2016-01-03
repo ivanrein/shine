@@ -22,14 +22,20 @@ import java.util.Objects;
  */
 public class EditPhotosFragment extends Fragment {
 
-    ArrayList<Bitmap> mPhotoResources;
+    ArrayList<Photo> mPhotoResources;
     ArrayList<ImageView> mPhotoHolder;
+    ArrayList<String> deletedPhotosId;
     ImageView mPhoto0, mPhoto1, mPhoto2, mPhoto3, mPhoto4, mPhoto5;
     final String NOT_EMPTY = "not_empty";
     final String EMPTY = "empty";
     public static final int GET_PHOTO = 177;
 
-    public ArrayList<Bitmap> getPhotoResources()
+    public ArrayList<String> getDeletedPhotosId()
+    {
+        return this.deletedPhotosId;
+    }
+
+    public ArrayList<Photo> getPhotoResources()
     {
         return this.mPhotoResources;
     }
@@ -54,6 +60,7 @@ public class EditPhotosFragment extends Fragment {
         mPhoto5 = (ImageView) v.findViewById(R.id.ivUser5);
 
         mPhotoHolder = new ArrayList<ImageView>();
+        deletedPhotosId = new ArrayList<String>();
 
         mPhotoHolder.add(mPhoto0);
         mPhotoHolder.add(mPhoto1);
@@ -72,6 +79,7 @@ public class EditPhotosFragment extends Fragment {
                     int position = mPhotoHolder.indexOf((ImageView) v);
                     if (mPhotoHolder.get(position).getTag().equals(NOT_EMPTY))
                     {
+                        deletedPhotosId.add(mPhotoResources.get(position).getPhotoId());
                         mPhotoResources.remove(position);
                         refreshHolders();
                         Log.d("PHOTOLONGCLICKED", "NOT_EMPTY");
@@ -104,7 +112,7 @@ public class EditPhotosFragment extends Fragment {
         int i;
         for (i = 0; i < mPhotoResources.size(); i++)
         {
-            mPhotoHolder.get(i).setImageBitmap(mPhotoResources.get(i));
+            mPhotoHolder.get(i).setImageBitmap(mPhotoResources.get(i).getBitmap());
             mPhotoHolder.get(i).setTag(NOT_EMPTY);
         }
 
@@ -116,7 +124,7 @@ public class EditPhotosFragment extends Fragment {
         }
     }
 
-    public void refreshPhotos(ArrayList<Bitmap> resources)
+    public void refreshPhotos(ArrayList<Photo> resources)
     {
         this.mPhotoResources = resources;
         refreshHolders();

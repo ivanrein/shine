@@ -31,7 +31,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.ads.mediation.customevent.CustomEventServerParameters;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,8 +52,9 @@ public class MyProfileActivity extends BaseActivity {
     public TextView mTextViewBio, mTextViewAge, mTextViewUser, mTextViewSchool;
     public EditText editTextBio;
     int container_height, container_width;
+    String new_photo_id = "";
     ImageView mImageViewGender;
-    ArrayList<Bitmap> photoList;
+    ArrayList<Photo> photoList;
     int total_loaded_images = 0;
 
     class GetImages extends AsyncTask<String, Void, Bitmap>{
@@ -75,7 +75,7 @@ public class MyProfileActivity extends BaseActivity {
             options.inJustDecodeBounds = false;
             Log.d("processing image", "processing image" + total_loaded_images);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-            photoList.add(bitmap);
+            photoList.get(total_loaded_images).setBitmap(bitmap);
             return bitmap;
         }
 
@@ -90,7 +90,7 @@ public class MyProfileActivity extends BaseActivity {
         }
     }
 
-    public ArrayList<Bitmap> getPhotoList()
+    public ArrayList<Photo> getPhotoList()
     {
         return this.photoList;
     }
@@ -100,8 +100,9 @@ public class MyProfileActivity extends BaseActivity {
         if(photoList.size() == 0 || position > photoList.size()-1)
             return BitmapFactory.decodeResource(getResources(), R.drawable.com_facebook_profile_picture_blank_square);
         else
-            return this.photoList.get(position);
+            return this.photoList.get(position).getBitmap();
     }
+
 
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -140,6 +141,12 @@ public class MyProfileActivity extends BaseActivity {
                                 Log.d("dapet image", ""+i);
                                 Log.d("dapet image", photos.getJSONObject(i).getString("photo"));
                                 new GetImages().execute(photos.getJSONObject(i).getString("photo"));
+                            }
+
+                            //ini idnya dapetnya gimana gw gatau arraynya
+                            JSONArray id= response.getJSONArray("id");
+                            for (int i = 0; i < id.length(); i++){
+                                photoList.add(new Photo(id.getJSONObject(i).getString("id")));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -230,6 +237,12 @@ public class MyProfileActivity extends BaseActivity {
         switch(item.getItemId()) {
             case R.id.action_done: {
                 //SAVE PROFILE HABIS EDIT DI SINI, SAVE KE API, DLL
+                ArrayList<String> deletedPhotosId = new ArrayList<>();
+
+                //ini id yg mau dihapus
+                deletedPhotosId = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getDeletedPhotosId();
+
+
                 mTextViewBio.setText(editTextBio.getText().toString());
                 photoList = ((EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT")).getPhotoResources();
 
@@ -311,8 +324,9 @@ public class MyProfileActivity extends BaseActivity {
                 InputStream inputStream = getContentResolver().openInputStream(data.getData());
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 bitmap = Bitmap.createScaledBitmap(bitmap, container_width, container_height, true);
-                photoList.add(bitmap);
+                photoList.add(new Photo(bitmap));
                 savePhoto(bitmap);
+
                 EditPhotosFragment tempFragment = (EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT");
                 tempFragment.refreshPhotos(photoList);
 
@@ -321,7 +335,7 @@ public class MyProfileActivity extends BaseActivity {
                     ImageView temp = ((ImageView) ((PhotosPagerFragment) mFragmentManager.findFragmentByTag("PAGER"))
                             .getViewPager().findViewWithTag("POSITION" + i));
                     if(temp!=null)
-                        temp.setImageBitmap(photoList.get(i));
+                        temp.setImageBitmap(photoList.get(i).getBitmap());
                 }
 
                 Log.d("Image", inputStream.toString());
@@ -355,9 +369,12 @@ public class MyProfileActivity extends BaseActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            if(response.getString("result").equals("success"))
+                            if(response.getString("result").equals("success")) {
                                 Toast.makeText(MyProfileActivity.this,
                                         "Photo successfully uploaded", Toast.LENGTH_SHORT).show();
+                                new_photo_id = response.getString("photo");
+                                photoList.get(photoList.size()-1).setPhotoId(new_photo_id);
+                            }
                             else{
                                 Toast.makeText(MyProfileActivity.this,
                                         "There were some errors", Toast.LENGTH_SHORT).show();
