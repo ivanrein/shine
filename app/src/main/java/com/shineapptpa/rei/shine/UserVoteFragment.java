@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,7 @@ public class UserVoteFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Buka profilenya di sini
-                ((HomeActivity)getActivity()).onProfilePictureClicked(mShineUsers.get(curr_position).getUser());
+                ((HomeActivity)getActivity()).onProfilePictureClicked(mShineUsers.get(0).getUser());
             }
         });
         mTextViewUsername = (TextView)v.findViewById(R.id.tvUserVoteName);
@@ -57,7 +58,7 @@ public class UserVoteFragment extends Fragment {
         Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "font/myfont.ttf");
         mTextViewUsername.setTypeface(tf);
 
-        bindUser(0);
+        bindUser();
         return v;
     }
 
@@ -67,18 +68,26 @@ public class UserVoteFragment extends Fragment {
         mButtonOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "1");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "1");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
             }
         });
         mButtonTwo = (Button)v.findViewById(R.id.btn2);
         mButtonTwo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "2");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "2");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -86,9 +95,13 @@ public class UserVoteFragment extends Fragment {
         mButtonThree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "3");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "3");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -96,9 +109,13 @@ public class UserVoteFragment extends Fragment {
         mButtonFour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "4");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "4");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -106,19 +123,26 @@ public class UserVoteFragment extends Fragment {
         mButtonFive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "5");
-                bindUser(curr_position);
-
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "5");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
             }
         });
         mButtonSix = (Button)v.findViewById(R.id.btn6);
         mButtonSix.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "6");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "6");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -126,9 +150,13 @@ public class UserVoteFragment extends Fragment {
         mButtonSeven.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "7");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "7");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -136,53 +164,73 @@ public class UserVoteFragment extends Fragment {
         mButtonEight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "8");
-                bindUser(curr_position);
-
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "8");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
             }
         });
         mButtonNine = (Button)v.findViewById(R.id.btn9);
         mButtonNine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "9");
-                bindUser(curr_position);
-
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "9");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
             }
         });
         mButtonTen = (Button)v.findViewById(R.id.btn10);
         mButtonTen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = mShineUsers.get(curr_position).getUser().get(ShineUser.MAP_USER_ID);
-                ((HomeActivity)getActivity()).voteRequest(id, "10");
-                bindUser(curr_position);
+                if(mShineUsers.size()!= 0) {
+                    String id = mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_ID);
+                    ((HomeActivity) getActivity()).voteRequest(id, "10");
+                    bindUser();
+                }
+                else
+                    Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void bindUser(int position)
+    private void bindUser()
     {
-        mImageViewGender.setImageResource(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_GENDER).equals("Male") ? R.drawable.gentleman : R.drawable.ladies);
+        if(mShineUsers.size() != 1) {
+            mImageViewGender.setImageResource(mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_GENDER).equals("Male") ? R.drawable.gentleman : R.drawable.ladies);
+            Log.d("bitmapuser", mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_BITMAP));
+            byte[] bytes = Base64.decode(mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_BITMAP), Base64.DEFAULT);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
 
-        Log.d("bitmapuser", mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_BITMAP));
-        byte[] bytes = Base64.decode(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_BITMAP), Base64.DEFAULT);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+            options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
+                    width,
+                    height);
+            options.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+            if (bitmap == null) {
+                mImageViewUserPhoto.setImageResource(R.drawable.com_facebook_profile_picture_blank_portrait);
+            } else
+                mImageViewUserPhoto.setImageBitmap(bitmap);
 
-        options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
-                width,
-                height);
-        options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length,options);
-        mImageViewUserPhoto.setImageBitmap(bitmap);
-
-        mTextViewSchool.setText(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_SCHOOL));
-        mTextViewUsername.setText(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_NAME));
-        mShineUsers.remove(position);
-        curr_position = position;
+            mTextViewSchool.setText(mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_SCHOOL));
+            mTextViewUsername.setText(mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_NAME));
+            mShineUsers.remove(0);
+        }
+        else
+        {
+            mImageViewGender.setImageResource(R.drawable.gentleman);
+            mImageViewUserPhoto.setImageResource(R.drawable.com_facebook_profile_picture_blank_portrait);
+            mTextViewSchool.setText("");
+            mTextViewUsername.setText("");
+        }
     }
 
 
