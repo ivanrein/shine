@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -166,6 +167,7 @@ public class UserVoteFragment extends Fragment {
     {
         mImageViewGender.setImageResource(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_GENDER).equals("Male") ? R.drawable.gentleman : R.drawable.ladies);
 
+        Log.d("bitmapuser", mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_BITMAP));
         byte[] bytes = Base64.decode(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_BITMAP), Base64.DEFAULT);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -180,7 +182,7 @@ public class UserVoteFragment extends Fragment {
         mTextViewSchool.setText(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_SCHOOL));
         mTextViewUsername.setText(mShineUsers.get(position).getUser().get(ShineUser.MAP_USER_NAME));
         mShineUsers.remove(position);
-        curr_position ++;
+        curr_position = position;
     }
 
 

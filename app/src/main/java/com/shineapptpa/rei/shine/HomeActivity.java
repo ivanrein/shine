@@ -61,15 +61,15 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mFragmentManager = getSupportFragmentManager();
-        ShineUser.setCurrentUser();
+        //ShineUser.setCurrentUser();
         setToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeNavbar();
 
         //oi ini setUser nya diisi user yg lagi login
         setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
-//        Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
-//        startService(NotifPoolIntent);
+        Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
+        startService(NotifPoolIntent);
 
         locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locListener = new LocationListener() {
@@ -79,8 +79,8 @@ public class HomeActivity extends BaseActivity {
                 RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                         getString(R.string.laravel_API_url)
-                                + "users?lat="+21 //lastLocation.getLatitude()
-                                +"&long="+ 22/*lastLocation.getLongitude()*/, null,
+                                + "users?lat="+lastLocation.getLatitude()
+                                +"&long="+ lastLocation.getLongitude(), null,
                         new Response.Listener<JSONObject>() {
 
                             @Override
@@ -96,14 +96,14 @@ public class HomeActivity extends BaseActivity {
                                             String gender = userArray.getJSONObject(i).getString("gender");
                                             String id = userArray.getJSONObject(i).getString("id");
                                             String schoolName = userArray.getJSONObject(i).getString("school_name");
-                                            mShineUsers.add(new ShineUser(name, encodedBitmap, gender, id, schoolName));
+                                            mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap ));
                                         }
 
                                     } catch (JSONException e) {
                                     }
                                     UserVoteFragment fragment = UserVoteFragment.createFragment();
                                     mFragmentManager.beginTransaction()
-                                            .add(R.id.top_container, fragment, "USER_VOTE")
+                                            .add(R.id.fragment_container, fragment, "USER_VOTE")
                                             .commit();
                                 }
                             }
@@ -382,6 +382,7 @@ public class HomeActivity extends BaseActivity {
         body.put("object_id", object_id);
         body.put("rate", rate);
         JSONObject postBody = new JSONObject(body);
+        Log.d("json", postBody.toString());
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, getString(R.string.laravel_API_url) + "vote", postBody,
                 new Response.Listener<JSONObject>() {
                     @Override
