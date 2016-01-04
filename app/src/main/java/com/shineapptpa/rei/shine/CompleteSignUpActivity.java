@@ -1,5 +1,6 @@
 package com.shineapptpa.rei.shine;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -217,6 +218,10 @@ public class CompleteSignUpActivity extends AppCompatActivity {
     }
 
     private void fetchSchool() {
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Fetching schools");
+        progress.setMessage("Please wait..");
+        progress.setCancelable(false);
         mRequestQue = Volley.newRequestQueue(getApplicationContext());
         JsonObjectRequest request = new JsonObjectRequest
                 (Request.Method.GET, getString(R.string.laravel_API_url) + "schools", null,
@@ -231,6 +236,7 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                                         schools.add(arr.getJSONObject(i).getString("name"));
                                         schools_id.add(arr.getJSONObject(i).getInt("id"));
                                     }
+
                                     adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, schools);
                                     adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                                     mSchoolSpinner.setAdapter(adapter);
@@ -251,7 +257,7 @@ public class CompleteSignUpActivity extends AppCompatActivity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
+                                progress.dismiss();
                             }
                         },
                         new Response.ErrorListener() {
@@ -263,5 +269,6 @@ public class CompleteSignUpActivity extends AppCompatActivity {
 
                 );
         mRequestQue.add(request);
+        progress.show();
     }
 }

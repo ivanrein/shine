@@ -153,7 +153,7 @@ public class MyProfileActivity extends BaseActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("ERROR", error.getLocalizedMessage());
+                        Log.d("ERROR", error.toString());
                     }
                 }){
             @Override

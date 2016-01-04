@@ -57,7 +57,7 @@ public class UserVoteFragment extends Fragment {
 
         Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "font/myfont.ttf");
         mTextViewUsername.setTypeface(tf);
-
+        if(mShineUsers.size() != 0)
         bindUser(mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_NAME), mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_GENDER), mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_BITMAP), mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_SCHOOL));
         return v;
     }

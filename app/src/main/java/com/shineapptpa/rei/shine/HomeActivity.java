@@ -76,54 +76,58 @@ public class HomeActivity extends BaseActivity {
         locListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                lastLocation = location;
-                RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
-                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                        getString(R.string.laravel_API_url)
-                                + "users?lat="+lastLocation.getLatitude()
-                                +"&long="+ lastLocation.getLongitude(), null,
-                        new Response.Listener<JSONObject>() {
+                if(lastLocation == null || haversine(lastLocation.getLatitude(), lastLocation.getLongitude(),
+                        location.getLatitude(), location.getLongitude()) > 2) {
+                    lastLocation = location;
+                    RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                            getString(R.string.laravel_API_url)
+                                    + "users?lat=" + lastLocation.getLatitude()
+                                    + "&long=" + lastLocation.getLongitude(), null,
+                            new Response.Listener<JSONObject>() {
 
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                if (!hasLocationSinceStarted) {
-                                    hasLocationSinceStarted = true;
-                                    Log.d("users respon", response.toString());
-                                    try {
-                                        JSONArray userArray = response.getJSONArray("users");
-                                        for (int i = 0; i < userArray.length(); i ++){
-                                            String encodedBitmap = userArray.getJSONObject(i).getString("photo");
-                                            String name = userArray.getJSONObject(i).getString("name");
-                                            String gender = userArray.getJSONObject(i).getString("gender");
-                                            String id = userArray.getJSONObject(i).getString("id");
-                                            String schoolName = userArray.getJSONObject(i).getString("school_name");
-                                            mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap ));
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    if (!hasLocationSinceStarted) {
+                                        hasLocationSinceStarted = true;
+                                        Log.d("users respon", response.toString());
+                                        try {
+                                            JSONArray userArray = response.getJSONArray("users");
+                                            for (int i = 0; i < userArray.length(); i++) {
+                                                String encodedBitmap = userArray.getJSONObject(i).getString("photo");
+                                                String name = userArray.getJSONObject(i).getString("name");
+                                                String gender = userArray.getJSONObject(i).getString("gender");
+                                                String id = userArray.getJSONObject(i).getString("id");
+                                                String schoolName = userArray.getJSONObject(i).getString("school_name");
+                                                mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap));
+                                            }
+
+                                        } catch (JSONException e) {
                                         }
-
-                                    } catch (JSONException e) {
+                                        UserVoteFragment fragment = UserVoteFragment.createFragment();
+                                        mFragmentManager.beginTransaction()
+                                                .add(R.id.fragment_container, fragment, "USER_VOTE")
+                                                .commit();
                                     }
-                                    UserVoteFragment fragment = UserVoteFragment.createFragment();
-                                    mFragmentManager.beginTransaction()
-                                            .add(R.id.fragment_container, fragment, "USER_VOTE")
-                                            .commit();
                                 }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d("connection", error.toString());
-                            }
-                        }) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<String, String>();
-                        params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
-                        return params;
-                    }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.d("connection", error.toString());
+                                }
+                            }) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
+                            return params;
+                        }
 
-                };
-                mRequestQue.add(request);
+                    };
+                    mRequestQue.add(request);
+                    locManager.removeUpdates(this);
+                }
             }
 
             @Override
@@ -142,10 +146,6 @@ public class HomeActivity extends BaseActivity {
                 Log.d("asd", "provider is disabled");
             }
         };
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("permission", "some permission not configured");
-        } else
-            locManager.requestLocationUpdates("gps", 3600000, 5000f, locListener);
     }
 
     public ArrayList<ShineUser> getShineUsers()
@@ -243,16 +243,13 @@ public class HomeActivity extends BaseActivity {
                     R.drawable.com_facebook_profile_picture_blank_portrait);
         }
         hasLocationSinceStarted = false;
-        if(lastLocation == null){
-            // kasih animasi loading mungkin
-            Log.d("lastloc", "last loc == null");
-        }
-        if (locManager.getProvider("gps") == null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Log.d("permission", "permission not configured.");
-            }
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("permission", "some permission not configured");
+        } else
             locManager.requestLocationUpdates("gps", 3600000, 5000f, locListener);
-        }
+
     }
 
     @Override
@@ -415,5 +412,15 @@ public class HomeActivity extends BaseActivity {
 
     }
 
-
+    private double haversine(double lat1, double lon1, double lat2, double lon2){
+        double R = 6371;
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLon = Math.toRadians(lon2-lon1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                            Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c;
+        return d;
+    }
 }
