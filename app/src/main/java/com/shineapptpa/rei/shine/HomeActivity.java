@@ -68,7 +68,7 @@ public class HomeActivity extends BaseActivity {
         initializeNavbar();
 
         //oi ini setUser nya diisi user yg lagi login
-        setUser("Erick Marchelino", "Binus University", R.drawable.com_facebook_profile_picture_blank_square);
+
         Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
         startService(NotifPoolIntent);
 
@@ -232,9 +232,15 @@ public class HomeActivity extends BaseActivity {
             ShineUser.fetchCurrentUser(this, new CustomCallback() {
                 @Override
                 public void callback() {
-
+                    setUser(ShineUser.getCurrentUser().get(ShineUser.MAP_USER_NAME),
+                            ShineUser.getCurrentUser().get(ShineUser.MAP_USER_SCHOOL),
+                            R.drawable.com_facebook_profile_picture_blank_portrait);
                 }
             });
+        }else{
+            setUser(ShineUser.getCurrentUser().get(ShineUser.MAP_USER_NAME),
+                    ShineUser.getCurrentUser().get(ShineUser.MAP_USER_SCHOOL),
+                    R.drawable.com_facebook_profile_picture_blank_portrait);
         }
         hasLocationSinceStarted = false;
         if(lastLocation == null){
