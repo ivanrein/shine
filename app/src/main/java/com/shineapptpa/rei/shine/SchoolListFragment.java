@@ -6,14 +6,29 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Marchelino on 01/01/2016.
@@ -23,7 +38,7 @@ public class SchoolListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private SchoolAdapter mSchoolAdapter;
-
+    private ArrayList<School> mSchools = new ArrayList<>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,8 +47,44 @@ public class SchoolListFragment extends Fragment {
 
     public void getSchoolData()
     {
-        //Tar fetch data pake volley di sini lu
+        RequestQueue q = Volley.newRequestQueue(getActivity());
+        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url)
+                + "getTopSchool",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray schools = response.getJSONArray("topschools");
+                            for (int i = 0;i < schools.length(); i++)
+                            {
+                                String name = schools.getJSONObject(i).getString("name");
+                                String id = schools.getJSONObject(i).getString("id");
+                                int average = schools.getJSONObject(i).getInt("schoolaverage");
+                                mSchools.add(new School(id, name, average));
+                            }
+                            mSchoolAdapter = new SchoolAdapter(mSchools);
+                            mRecyclerView.setAdapter(mSchoolAdapter);
 
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("ERROR", error.getLocalizedMessage());
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("utoken", CustomPref.getUserAccessToken(getContext()));
+                return map;
+            }
+        };
+        q.add(r);
     }
 
 
@@ -56,15 +107,8 @@ public class SchoolListFragment extends Fragment {
 
     public void updateUI()
     {
-        //dummy data
-        List<School> mSchools = new ArrayList<School>();
-        for (int i = 0; i < 25; i++)
-        {
-            mSchools.add(new School("Sekolah "+i, .23, .23, 90));
-        }
-
-        mSchoolAdapter = new SchoolAdapter(mSchools);
-        mRecyclerView.setAdapter(mSchoolAdapter);
+        mSchools.clear();
+        getSchoolData();
     }
 
     private class SchoolHolder extends RecyclerView.ViewHolder implements View.OnClickListener

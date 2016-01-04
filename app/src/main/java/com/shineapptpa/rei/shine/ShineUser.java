@@ -34,6 +34,9 @@ public class ShineUser {
 
 
     public final static String MAP_USER_NAME = "name";
+    public final static String MAP_USER_RATE = "rate";
+    public final static String MAP_USER_ID = "user_id";
+    public final static String MAP_USER_BITMAP = "photo";
     public final static String MAP_USER_SCHOOL = "school";
     public final static String MAP_USER_BIO = "bio";
     public final static String MAP_USER_GENDER = "gender";
@@ -58,11 +61,25 @@ public class ShineUser {
         return this.school;
     }
 
-    //hapus aja
-    public ShineUser(String name, int rate, String bio) {
-        currentUser = new HashMap<>();
-        currentUser.put(MAP_USER_BIO, bio);
-        currentUser.put(MAP_USER_NAME, name);
+    public ShineUser(String id, String name, String schoolName, String gender, String encodedBitmap)
+    {
+        user = new HashMap<>();
+        user.put(MAP_USER_ID, id);
+        user.put(MAP_USER_NAME, name);
+        user.put(MAP_USER_GENDER, gender);
+        user.put(MAP_USER_SCHOOL, schoolName);
+        user.put(MAP_USER_BITMAP, encodedBitmap);
+    }
+
+    public ShineUser(String id, String name, String schoolName, String gender, String encodedBitmap, String rate)
+    {
+        user = new HashMap<>();
+        user.put(MAP_USER_ID, id);
+        user.put(MAP_USER_NAME, name);
+        user.put(MAP_USER_GENDER, gender);
+        user.put(MAP_USER_SCHOOL, schoolName);
+        user.put(MAP_USER_BITMAP, encodedBitmap);
+        user.put(MAP_USER_RATE, rate);
     }
 
     public ShineUser(JSONObject userInfos, JSONObject schoolInfo) {
