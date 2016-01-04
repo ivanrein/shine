@@ -55,6 +55,7 @@ public class HomeActivity extends BaseActivity {
     private FragmentManager mFragmentManager;
     boolean hasLocationSinceStarted;
     private ArrayList<ShineUser> mShineUsers = new ArrayList<ShineUser>();
+    String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +73,12 @@ public class HomeActivity extends BaseActivity {
         startService(NotifPoolIntent);
 
         locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+
         locListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Log.d("location changed", "asdasd");
                 if(lastLocation == null || haversine(lastLocation.getLatitude(), lastLocation.getLongitude(),
                         location.getLatitude(), location.getLongitude()) > 2) {
                     lastLocation = location;
@@ -226,6 +230,13 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void onStart() {
         Log.d("onstart", "home on start called");
+
+        lastLocation = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(locManager.getLastKnownLocation("gps") != null){
+            lastLocation = locManager.getLastKnownLocation("gps");
+        }
+
+
         super.onStart();
         if (CustomPref.getUserAccessToken(this) == null) {
             LoginManager.getInstance().logOut();
