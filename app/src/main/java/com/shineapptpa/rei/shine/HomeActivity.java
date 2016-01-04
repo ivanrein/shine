@@ -62,12 +62,11 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mFragmentManager = getSupportFragmentManager();
-        //ShineUser.setCurrentUser();
+
+
         setToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeNavbar();
-
-        //oi ini setUser nya diisi user yg lagi login
 
         Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
         startService(NotifPoolIntent);
@@ -308,7 +307,6 @@ public class HomeActivity extends BaseActivity {
             }
         });
 
-        //dummy data
         mNavbarItems.add(new NavItem("MyProfile", "Set your profile setting and more", R.drawable.com_facebook_button_icon));
         mNavbarItems.add(new NavItem("Top School", "Most popular school", R.drawable.com_facebook_button_icon));
         mNavbarItems.add(new NavItem("Logout", "Logout from Shine", R.drawable.com_facebook_button_icon));

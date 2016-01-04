@@ -60,15 +60,13 @@ public class ShineUser {
         return this.school;
     }
 
-
-
-    public ShineUser(String id, String name, String schoolName, String gender, String encodedBitmap, String rate)
+    public ShineUser(String email, String name, String schoolId, String gender, String encodedBitmap, String rate)
     {
         user = new HashMap<>();
-        user.put(MAP_USER_ID, id);
+        user.put(MAP_USER_ID, email);
         user.put(MAP_USER_NAME, name);
         user.put(MAP_USER_GENDER, gender);
-        user.put(MAP_USER_SCHOOL, schoolName);
+        user.put(MAP_USER_SCHOOL, schoolId);
         user.put(MAP_USER_BITMAP, encodedBitmap);
         user.put(MAP_USER_RATE, rate);
     }

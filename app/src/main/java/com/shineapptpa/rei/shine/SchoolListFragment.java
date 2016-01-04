@@ -128,7 +128,7 @@ public class SchoolListFragment extends Fragment {
         public void onClick(View v) {
             FragmentManager fm = getFragmentManager();
             SchoolStudentListFragment fragment = SchoolStudentListFragment
-                    .createFragment(getActivity(), 0);
+                    .createFragment(getActivity(), mSchool.getId());
             fm.beginTransaction()
                     .replace(R.id.fragment_container, fragment,"STUDENT LIST")
                     .addToBackStack(null)

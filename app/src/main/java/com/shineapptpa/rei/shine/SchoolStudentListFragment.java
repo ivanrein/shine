@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,8 @@ public class SchoolStudentListFragment extends Fragment {
     private ShineUserAdapter mStudentAdapter;
     public static final String ARGS_SCHOOL_ID="com.shineapptpa.rei.shine.schoolstudentlistfragment.school_id";
     private ArrayList<ShineUser> mShineUsers;
-    int school_id, width = 0, height = 0;
+    String school_id;
+    int width = 0, height = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,16 +63,16 @@ public class SchoolStudentListFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray userArray = response.getJSONArray("users");
+                            JSONArray userArray = response.getJSONArray("topStudents");
                             mShineUsers.clear();
                             for (int i = 0; i < userArray.length(); i ++){
                                 String encodedBitmap = userArray.getJSONObject(i).getString("photo");
                                 String name = userArray.getJSONObject(i).getString("name");
                                 String gender = userArray.getJSONObject(i).getString("gender");
-                                String id = userArray.getJSONObject(i).getString("id");
-                                String schoolName = userArray.getJSONObject(i).getString("school_name");
-                                String rate = userArray.getJSONObject(i).getString("rate");
-                                mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap, rate));
+                                String email = userArray.getJSONObject(i).getString("email");
+                                String schoolId = school_id;
+                                String rate = userArray.getJSONObject(i).getString("rata");
+                                mShineUsers.add(new ShineUser(email, name, schoolId, gender, encodedBitmap, rate));
                             }
                             mStudentAdapter = new ShineUserAdapter(mShineUsers);
                             mRecyclerView.setAdapter(mStudentAdapter);
@@ -106,18 +108,23 @@ public class SchoolStudentListFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mShineUsers = new ArrayList<>();
         //exception di sini
-        school_id = (int)getArguments().getSerializable(ARGS_SCHOOL_ID);
-        height = ((ImageView)v.findViewById(R.id.ivShineUserPhoto)).getHeight();
-        width = ((ImageView)v.findViewById(R.id.ivShineUserPhoto)).getWidth();
+        school_id = (String)getArguments().getSerializable(ARGS_SCHOOL_ID);
+        Log.d("school_id", school_id+"");
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        width = (int)(display.getWidth()/.25);
+        height = (int)(display.getHeight()/.25);
+        Log.d("width", width+"");
+        Log.d("height", height+"");
         updateUI();
         return v;
     }
 
-    public static SchoolStudentListFragment createFragment(Context context, int schoolId)
+    public static SchoolStudentListFragment createFragment(Context context, String schoolId)
     {
         SchoolStudentListFragment fragment = new SchoolStudentListFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARGS_SCHOOL_ID, schoolId);
+        fragment.setArguments(args);
         return fragment;
     }
 
