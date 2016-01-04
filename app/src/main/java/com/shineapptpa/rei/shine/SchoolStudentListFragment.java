@@ -1,14 +1,10 @@
 package com.shineapptpa.rei.shine;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -111,8 +107,8 @@ public class SchoolStudentListFragment extends Fragment {
         school_id = (String)getArguments().getSerializable(ARGS_SCHOOL_ID);
         Log.d("school_id", school_id+"");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
-        width = (int)(display.getWidth()/.25);
-        height = (int)(display.getHeight()/.25);
+        width = (int)(display.getWidth()*.25);
+        height = (int)(display.getHeight()*.25);
         Log.d("width", width+"");
         Log.d("height", height+"");
         updateUI();
@@ -171,15 +167,8 @@ public class SchoolStudentListFragment extends Fragment {
             else
                 mTextViewRate.setBackgroundColor(getResources().getColor(R.color.one));
 
-            byte[] bytes = Base64.decode(mShineUser.getUser().get(ShineUser.MAP_USER_BITMAP), Base64.DEFAULT);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
 
-            options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
-                    width,
-                    height);
-            options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+            Bitmap bitmap = ImageProcessingHelper.decodeBitmap(mShineUser.getUser().get(ShineUser.MAP_USER_BITMAP), width, height);
             if (bitmap == null) {
                 mImageViewPhoto.setImageResource(R.drawable.com_facebook_profile_picture_blank_portrait);
             } else

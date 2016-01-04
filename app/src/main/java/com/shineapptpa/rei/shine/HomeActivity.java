@@ -79,14 +79,16 @@ public class HomeActivity extends BaseActivity {
                 RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                         getString(R.string.laravel_API_url)
-                                + "users?lat="+lastLocation.getLatitude()
+                                + "users?lat=-"+lastLocation.getLatitude()
                                 +"&long="+ lastLocation.getLongitude(), null,
                         new Response.Listener<JSONObject>() {
-
+//6.169057 106.789132
                             @Override
                             public void onResponse(JSONObject response) {
                                 if (!hasLocationSinceStarted) {
                                     hasLocationSinceStarted = true;
+                                    Log.d("lat:", lastLocation.getLatitude()+"");
+                                    Log.d("long:", lastLocation.getLongitude()+"");
                                     Log.d("users respon", response.toString());
                                     try {
                                         JSONArray userArray = response.getJSONArray("users");
@@ -94,9 +96,9 @@ public class HomeActivity extends BaseActivity {
                                             String encodedBitmap = userArray.getJSONObject(i).getString("photo");
                                             String name = userArray.getJSONObject(i).getString("name");
                                             String gender = userArray.getJSONObject(i).getString("gender");
-                                            String id = userArray.getJSONObject(i).getString("id");
+                                            String email = userArray.getJSONObject(i).getString("email");
                                             String schoolName = userArray.getJSONObject(i).getString("school_name");
-                                            mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap ));
+                                            mShineUsers.add(new ShineUser(email, name, schoolName, gender, encodedBitmap ));
                                         }
 
                                     } catch (JSONException e) {
@@ -152,59 +154,6 @@ public class HomeActivity extends BaseActivity {
         return this.mShineUsers;
     }
 
-    /*
-    * ini tadi mau buat kalo usernya habis, minta request lagi gitu
-    * tapi gajadi haha
-    * */
-    public ArrayList<ShineUser> newRequest()
-    {
-        RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                getString(R.string.laravel_API_url)
-                        + "users?lat="+21//lastLocation.getLatitude()
-                        +"&long="+22/*lastLocation.getLongitude()*/, null,
-                new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        if (!hasLocationSinceStarted) {
-                            hasLocationSinceStarted = true;
-                            Log.d("users respon", response.toString());
-                            try {
-                                JSONArray userArray = response.getJSONArray("users");
-                                mShineUsers.clear();
-                                for (int i = 0; i < userArray.length(); i ++){
-                                    String encodedBitmap = userArray.getJSONObject(i).getString("photo");
-                                    String name = userArray.getJSONObject(i).getString("name");
-                                    String gender = userArray.getJSONObject(i).getString("gender");
-                                    String id = userArray.getJSONObject(i).getString("id");
-                                    String schoolName = userArray.getJSONObject(i).getString("school_name");
-                                    mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap));
-                                }
-
-                            } catch (JSONException e) {
-                            }
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("connection", error.toString());
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("utoken", CustomPref.getUserAccessToken(getApplicationContext()));
-                return params;
-            }
-
-        };
-        mRequestQue.add(request);
-        return this.mShineUsers;
-    }
-
     private void setUser(String name, String school, int profilePicture) {
         mTextViewUsername.setText(name);
         mTextViewSchool.setText(school);
@@ -219,6 +168,9 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void onStart() {
         Log.d("onstart", "home on start called");
+//        lastLocation = locManager.getLastKnownLocation("gps");
+//        Log.d("onstart",lastLocation.getLongitude()+"");
+//        Log.d("onstart",lastLocation.getLatitude()+"");
         super.onStart();
         if (CustomPref.getUserAccessToken(this) == null) {
             LoginManager.getInstance().logOut();
@@ -251,6 +203,7 @@ public class HomeActivity extends BaseActivity {
                 Log.d("permission", "permission not configured.");
             }
             locManager.requestLocationUpdates("gps", 3600000, 5000f, locListener);
+            Log.d("permission", "permission not configured.");
         }
     }
 
@@ -310,9 +263,9 @@ public class HomeActivity extends BaseActivity {
             }
         });
 
-        mNavbarItems.add(new NavItem("MyProfile", "Set your profile setting and more", R.drawable.com_facebook_button_icon));
-        mNavbarItems.add(new NavItem("Top School", "Most popular school", R.drawable.com_facebook_button_icon));
-        mNavbarItems.add(new NavItem("Logout", "Logout from Shine", R.drawable.com_facebook_button_icon));
+        //ini yang MyProfile ga kepake
+        mNavbarItems.add(new NavItem("Top School", "Most popular school", R.drawable.school));
+        mNavbarItems.add(new NavItem("Logout", "Logout from Shine", R.drawable.logout));
 
         mNavbarLayout.setDrawerListener(mActionBarDrawerToggle);
         refreshNavbar();
@@ -321,14 +274,14 @@ public class HomeActivity extends BaseActivity {
     public void selectMenu(int position) {
         //start intent from the nav bar here broh
         Toast.makeText(HomeActivity.this, mNavbarItems.get(position).getTitle(), Toast.LENGTH_SHORT).show();
-        if (position == 1) { // ke SchoolList
+        if (position == 0) { // ke SchoolList
             SchoolListFragment fragment = SchoolListFragment.createFragment(HomeActivity.this);
             mFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, fragment, "School_List")
                     .addToBackStack(null)
                     .commit();
         }
-        if (position == 2) { // logout
+        if (position == 1) { // logout
             if (CustomPref.resetAccessToken(getApplicationContext())) {
                 LoginManager.getInstance().logOut();
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);

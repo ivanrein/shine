@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class UserVoteFragment extends Fragment {
     private ArrayList<ShineUser> mShineUsers;
     int curr_position = 0;
     int width = 0, height = 0;
+    int btn_height = 0, btn_width = 0;
 
     @Nullable
     @Override
@@ -52,8 +54,13 @@ public class UserVoteFragment extends Fragment {
         mTextViewSchool = (TextView)v.findViewById(R.id.tvUserSchool);
 
         mShineUsers = ((HomeActivity)getActivity()).getShineUsers();
-        height = ((ImageView)v.findViewById(R.id.ivUserPhoto)).getHeight();
-        width = ((ImageView)v.findViewById(R.id.ivUserPhoto)).getWidth();
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        width = (int)(display.getWidth()*.35);
+        height = (int)(display.getHeight()*.5);
+        btn_width = (int)(display.getWidth()*.2);
+        btn_height = (int)(display.getHeight()*.2);
+        mImageViewUserPhoto.setMaxHeight(height);
+        mImageViewUserPhoto.setMaxWidth(width);
 
         Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "font/myfont.ttf");
         mTextViewUsername.setTypeface(tf);
@@ -237,6 +244,39 @@ public class UserVoteFragment extends Fragment {
                     Toast.makeText(getActivity(), "No user", Toast.LENGTH_SHORT).show();
             }
         });
+        mButtonOne.setHeight(btn_height);
+        mButtonOne.setWidth(btn_width);
+
+        mButtonTwo.setHeight(btn_height);
+        mButtonTwo.setWidth(btn_width);
+
+        mButtonThree.setHeight(btn_height);
+        mButtonThree.setWidth(btn_width);
+
+        mButtonFour.setHeight(btn_height);
+        mButtonFour.setWidth(btn_width);
+
+        mButtonFive.setHeight(btn_height);
+        mButtonFive.setWidth(btn_width);
+
+        mButtonSix.setHeight(btn_height);
+        mButtonSix.setWidth(btn_width);
+
+        mButtonSeven.setHeight(btn_height);
+        mButtonSeven.setWidth(btn_width);
+
+        mButtonEight.setHeight(btn_height);
+        mButtonEight.setWidth(btn_width);
+
+        mButtonNine.setHeight(btn_height);
+        mButtonNine.setWidth(btn_width);
+
+        mButtonTen.setHeight(btn_height);
+        mButtonTen.setWidth(btn_width);
+
+
+
+
     }
 
     private void bindUser(String name, String gender, String photo, String school)

@@ -1,6 +1,8 @@
 package com.shineapptpa.rei.shine;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 /**
  * Created by Marchelino on 03/01/2016.
@@ -23,5 +25,18 @@ public class ImageProcessingHelper {
         }
 
         return inSampleSize;
+    }
+
+    public static Bitmap decodeBitmap(String decodedString, int reqWidth, int reqHeight) {
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        byte[] bytes = Base64.decode(decodedString, Base64.DEFAULT);
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
     }
 }

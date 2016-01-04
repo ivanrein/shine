@@ -14,7 +14,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
-        android:background="@color/lightPrimary"
+        android:background="@color/white"
         android:src="@drawable/com_facebook_button_icon"
         />
 

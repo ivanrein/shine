@@ -22,7 +22,6 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -61,19 +60,11 @@ public class MyProfileActivity extends BaseActivity {
 
         @Override
         protected Bitmap doInBackground(String... params) {
-            byte[] decodedString = null;
-            decodedString = Base64.decode(params[0], Base64.DEFAULT);
 
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-
-            options.inJustDecodeBounds = true;
-            options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
-                    container_width,
-                    container_height);
-            options.inJustDecodeBounds = false;
             Log.d("processing image", "processing image" + total_loaded_images);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            Bitmap bitmap = ImageProcessingHelper.decodeBitmap(params[0], container_width, container_height);
+
             photoList.add(new Photo(params[1]));
             photoList.get(photoList.size()-1).setBitmap(bitmap);
             return bitmap;
@@ -136,7 +127,7 @@ public class MyProfileActivity extends BaseActivity {
                         	//Jangan lupa, ganti ip address sama structure json nya sesuain sama punya lu,
                         	//ini gw bikin routes sendiri soalnya
                             JSONArray photos= response.getJSONArray("photos");
-
+                            Log.d("onResponse","fetching foto");
                             for (int i = 0; i < photos.length(); i++){
 
                                 Log.d("dapet image", photos.getJSONObject(i).getString("id"));
@@ -294,29 +285,6 @@ public class MyProfileActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void deletePhoto(ArrayList<String> deletedPhotosId) {
-
-    }
-
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
