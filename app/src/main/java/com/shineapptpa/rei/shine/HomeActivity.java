@@ -70,21 +70,23 @@ public class HomeActivity extends BaseActivity {
 
         Intent NotifPoolIntent = new Intent(getApplicationContext(), NotifPoolService.class);
         startService(NotifPoolIntent);
-
         locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Log.d("provider enabled", locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) + "");
         locListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Log.d("provider enabled","LOCATION JALAN BUNG");
                 lastLocation = location;
                 RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                         getString(R.string.laravel_API_url)
-                                + "users?lat=-"+lastLocation.getLatitude()
+                                + "users?lat="+lastLocation.getLatitude()
                                 +"&long="+ lastLocation.getLongitude(), null,
                         new Response.Listener<JSONObject>() {
 //6.169057 106.789132
                             @Override
                             public void onResponse(JSONObject response) {
+                                Log.d("provider enabled","LOCATION FETCH BUNG");
                                 if (!hasLocationSinceStarted) {
                                     hasLocationSinceStarted = true;
                                     Log.d("lat:", lastLocation.getLatitude()+"");
@@ -103,10 +105,12 @@ public class HomeActivity extends BaseActivity {
 
                                     } catch (JSONException e) {
                                     }
-                                    UserVoteFragment fragment = UserVoteFragment.createFragment();
-                                    mFragmentManager.beginTransaction()
-                                            .add(R.id.fragment_container, fragment, "USER_VOTE")
-                                            .commit();
+
+                                        UserVoteFragment fragment = UserVoteFragment.createFragment();
+                                        mFragmentManager.beginTransaction()
+                                                .add(R.id.fragment_container, fragment, "USER_VOTE")
+                                                .commit();
+                                    
                                 }
                             }
                         },
@@ -146,7 +150,7 @@ public class HomeActivity extends BaseActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d("permission", "some permission not configured");
         } else
-            locManager.requestLocationUpdates("gps", 3600000, 5000f, locListener);
+            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3600000, 5000f, locListener);
     }
 
     public ArrayList<ShineUser> getShineUsers()
@@ -202,7 +206,7 @@ public class HomeActivity extends BaseActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Log.d("permission", "permission not configured.");
             }
-            locManager.requestLocationUpdates("gps", 3600000, 5000f, locListener);
+            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3600000, 5000f, locListener);
             Log.d("permission", "permission not configured.");
         }
     }

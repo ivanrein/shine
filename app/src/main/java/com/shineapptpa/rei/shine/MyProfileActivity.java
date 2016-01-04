@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -297,8 +298,13 @@ public class MyProfileActivity extends BaseActivity {
             try {
                 InputStream inputStream = getContentResolver().openInputStream(data.getData());
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                bitmap = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
+
                 bitmap = Bitmap.createScaledBitmap(bitmap, container_width, container_height, true);
                 photoList.add(new Photo(bitmap));
+
                 savePhoto(bitmap);
 
                 EditPhotosFragment tempFragment = (EditPhotosFragment)mFragmentManager.findFragmentByTag("EDIT");
