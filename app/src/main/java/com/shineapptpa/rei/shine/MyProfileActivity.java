@@ -359,7 +359,7 @@ public class MyProfileActivity extends BaseActivity {
     private void savePhoto(final Bitmap bitmap){
         RequestQueue qUploadFoto = Volley.newRequestQueue(this);
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 10, byteOutput);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteOutput);
         byte[] b = byteOutput.toByteArray();
         HashMap<String, String> photo = new HashMap<>();
 

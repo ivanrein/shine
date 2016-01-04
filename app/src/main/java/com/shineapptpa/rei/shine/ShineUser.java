@@ -103,12 +103,15 @@ public class ShineUser {
         user.put(MAP_USER_SCHOOL, schoolName);
         user.put(MAP_USER_BITMAP, encodedBitmap);
     }
-
     public static void resetCurrent(){
         currentSchool = null;
         currentUser = null;
     }
 
+
+    public void updateUser(String key, String value){
+        this.user.put(key, value);
+    }
 
     public static void updateCurrentUser(String key, String value){
         currentUser.put(key, value);

@@ -45,7 +45,9 @@ public class UserVoteFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Buka profilenya di sini
+                Log.d("on pic click", mShineUsers.get(0).getUser().get(ShineUser.MAP_USER_EMAIL));
                 ((HomeActivity)getActivity()).onProfilePictureClicked(mShineUsers.get(0).getUser());
+
             }
         });
         mTextViewUsername = (TextView)v.findViewById(R.id.tvUserVoteName);

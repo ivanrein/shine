@@ -98,7 +98,12 @@ public class HomeActivity extends BaseActivity {
                                                 String gender = userArray.getJSONObject(i).getString("gender");
                                                 String id = userArray.getJSONObject(i).getString("id");
                                                 String schoolName = userArray.getJSONObject(i).getString("school_name");
-                                                mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap));
+                                                String email = userArray.getJSONObject(i).getString("email");
+                                                String bio = userArray.getJSONObject(i).getString("bio");
+                                                ShineUser baru = new ShineUser(id, name, schoolName, gender, encodedBitmap);
+                                                baru.updateUser(ShineUser.MAP_USER_EMAIL, email);
+                                                baru.updateUser(ShineUser.MAP_USER_BIO, bio);
+                                                mShineUsers.add(baru);
                                             }
 
                                         } catch (JSONException e) {
@@ -178,8 +183,10 @@ public class HomeActivity extends BaseActivity {
                                     String name = userArray.getJSONObject(i).getString("name");
                                     String gender = userArray.getJSONObject(i).getString("gender");
                                     String id = userArray.getJSONObject(i).getString("id");
+                                    String email = userArray.getJSONObject(i).getString("email");
                                     String schoolName = userArray.getJSONObject(i).getString("school_name");
                                     mShineUsers.add(new ShineUser(id, name, schoolName, gender, encodedBitmap));
+
                                 }
 
                             } catch (JSONException e) {
