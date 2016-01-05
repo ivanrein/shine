@@ -1,4 +1,4 @@
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;

@@ -8,7 +8,7 @@ android {
         mavenCentral()
     }
     defaultConfig {
-        applicationId "com.shineapptpa.rei.shine"
+        applicationId "edu.bluejack151.Shine.shine"
         minSdkVersion 18
         targetSdkVersion 22
         versionCode 1

@@ -1,5 +1,5 @@
 
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 import android.Manifest;
 import android.content.Intent;

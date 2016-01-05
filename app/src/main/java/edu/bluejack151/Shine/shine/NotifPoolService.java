@@ -1,4 +1,4 @@
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,10 +10,8 @@ import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.JsonReader;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
 import com.pusher.client.Pusher;
 import com.pusher.client.channel.Channel;
 import com.pusher.client.channel.SubscriptionEventListener;

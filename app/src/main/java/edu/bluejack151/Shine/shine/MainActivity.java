@@ -1,9 +1,8 @@
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -41,7 +40,6 @@ import com.facebook.login.widget.LoginButton;
 //import com.parse.ParseException;
 //import com.parse.ParseUser;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

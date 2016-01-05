@@ -1,9 +1,7 @@
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -72,7 +70,12 @@ public class SchoolStudentListFragment extends Fragment {
                                 String email = userArray.getJSONObject(i).getString("email");
                                 String schoolId = school_id;
                                 String rate = userArray.getJSONObject(i).getString("rata");
+                                String bio = userArray.getJSONObject(i).getString("bio");
                                 mShineUsers.add(new ShineUser(email, name, schoolId, gender, encodedBitmap, rate));
+                                ShineUser newGuy = mShineUsers.get(mShineUsers.size() - 1);
+                                newGuy.updateUser(ShineUser.MAP_USER_BIO, bio);
+                                newGuy.updateUser(ShineUser.MAP_USER_EMAIL, email);
+
                             }
                             mStudentAdapter = new ShineUserAdapter(mShineUsers);
                             mRecyclerView.setAdapter(mStudentAdapter);

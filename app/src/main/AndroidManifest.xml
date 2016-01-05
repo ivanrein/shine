@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.shineapptpa.rei.shine"
+<manifest package="edu.bluejack151.Shine.shine"
      xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme"
         android:largeHeap="true"
         >
-        <receiver android:name=".BootBroadcastReceiver">
+        <receiver android:name="edu.bluejack151.Shine.shine.BootBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -24,7 +24,7 @@
             android:value="@string/facebook_app_id"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name="edu.bluejack151.Shine.shine.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -37,17 +37,17 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity
-            android:name=".CompleteSignUpActivity"
+            android:name="edu.bluejack151.Shine.shine.CompleteSignUpActivity"
             android:label="@string/title_activity_complete_sign_up">
         </activity>
-        <activity android:name=".HomeActivity">
+        <activity android:name="edu.bluejack151.Shine.shine.HomeActivity">
         </activity>
         <activity
-            android:name=".MyProfileActivity"
-            android:parentActivityName=".HomeActivity"
+            android:name="edu.bluejack151.Shine.shine.MyProfileActivity"
+            android:parentActivityName="edu.bluejack151.Shine.shine.HomeActivity"
             >
         </activity>
-        <service android:name=".NotifPoolService"></service>
+        <service android:name="edu.bluejack151.Shine.shine.NotifPoolService"></service>
     </application>
 
 </manifest>

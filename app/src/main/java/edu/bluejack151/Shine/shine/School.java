@@ -1,4 +1,4 @@
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 import java.io.Serializable;
 

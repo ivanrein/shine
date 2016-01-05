@@ -1,9 +1,7 @@
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;

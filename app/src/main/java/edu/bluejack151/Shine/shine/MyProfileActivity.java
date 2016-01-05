@@ -1,5 +1,5 @@
 
-package com.shineapptpa.rei.shine;
+package edu.bluejack151.Shine.shine;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,11 +19,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
