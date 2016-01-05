@@ -2,6 +2,7 @@
 package edu.bluejack151.Shine.shine;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -55,6 +56,7 @@ public class HomeActivity extends BaseActivity {
     private FragmentManager mFragmentManager;
     boolean hasLocationSinceStarted;
     private ArrayList<ShineUser> mShineUsers = new ArrayList<ShineUser>();
+    ProgressDialog fetchingUsersDialog;
     String provider;
 
     @Override
@@ -63,8 +65,10 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         mFragmentManager = getSupportFragmentManager();
-
-
+        fetchingUsersDialog = new ProgressDialog(this);
+        fetchingUsersDialog.setTitle("Getting users");
+        fetchingUsersDialog.setMessage("Please wait..");
+        fetchingUsersDialog.setCancelable(false);
         setToolbar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initializeNavbar();
@@ -78,7 +82,7 @@ public class HomeActivity extends BaseActivity {
         locListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("location changed", "asdasd");
+                Toast.makeText(HomeActivity.this, "Fetched new Location..", Toast.LENGTH_SHORT).show();
                 if(lastLocation == null || haversine(lastLocation.getLatitude(), lastLocation.getLongitude(),
                         location.getLatitude(), location.getLongitude()) > 2) {
                     lastLocation = location;
@@ -117,6 +121,7 @@ public class HomeActivity extends BaseActivity {
                                                 .add(R.id.fragment_container, fragment, "USER_VOTE")
                                                 .commit();
                                     }
+                                    fetchingUsersDialog.dismiss();
                                 }
                             },
                             new Response.ErrorListener() {
@@ -134,6 +139,7 @@ public class HomeActivity extends BaseActivity {
 
                     };
                     mRequestQue.add(request);
+                    fetchingUsersDialog.show();
                     locManager.removeUpdates(this);
                 }
             }
@@ -231,10 +237,6 @@ public class HomeActivity extends BaseActivity {
     protected void onStart() {
         Log.d("onstart", "home on start called");
 
-        lastLocation = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if(locManager.getLastKnownLocation("gps") != null){
-            lastLocation = locManager.getLastKnownLocation("gps");
-        }
 
 
         super.onStart();
@@ -264,14 +266,16 @@ public class HomeActivity extends BaseActivity {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d("permission", "some permission not configured");
+            Toast.makeText(HomeActivity.this, "Puhlis grant permission", Toast.LENGTH_SHORT).show();
         } else
-            locManager.requestLocationUpdates("gps", 3600000, 5000f, locListener);
+            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5000f, locListener);
 
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        locManager.removeUpdates(locListener);
     }
 
     private void initializeNavbar() {
