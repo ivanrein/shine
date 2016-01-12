@@ -177,7 +177,7 @@ public class SchoolStudentListFragment extends Fragment {
             byte[] bytes = Base64.decode(mShineUser.getUser().get(ShineUser.MAP_USER_BITMAP), Base64.DEFAULT);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
             options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
                     width,
                     height);

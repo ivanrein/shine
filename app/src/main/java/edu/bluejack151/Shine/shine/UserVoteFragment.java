@@ -247,7 +247,7 @@ public class UserVoteFragment extends Fragment {
             byte[] bytes = Base64.decode(photo, Base64.DEFAULT);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
             options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
                     width,
                     height);

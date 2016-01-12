@@ -268,7 +268,14 @@ public class HomeActivity extends BaseActivity {
             Log.d("permission", "some permission not configured");
             Toast.makeText(HomeActivity.this, "Puhlis grant permission", Toast.LENGTH_SHORT).show();
         } else
-            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 5000f, locListener);
+            locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER  , 0, 5000f, locListener);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("HomeAct", "on destroy called");
+        super.onDestroy();
 
     }
 
@@ -276,6 +283,7 @@ public class HomeActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         locManager.removeUpdates(locListener);
+
     }
 
     private void initializeNavbar() {

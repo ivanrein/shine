@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class MyProfileActivity extends BaseActivity {
@@ -55,11 +56,13 @@ public class MyProfileActivity extends BaseActivity {
     ImageView mImageViewGender;
     ArrayList<Photo> photoList;
     int total_loaded_images = 0;
-
+    ArrayList<GetImages> referenceKeeper;
+    JsonObjectRequest imageRequest;
     class GetImages extends AsyncTask<String, Void, Bitmap>{
-
+        boolean running = true;
         @Override
         protected Bitmap doInBackground(String... params) {
+
             byte[] decodedString = null;
             decodedString = Base64.decode(params[0], Base64.DEFAULT);
 
@@ -67,6 +70,7 @@ public class MyProfileActivity extends BaseActivity {
             BitmapFactory.Options options = new BitmapFactory.Options();
 
             options.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
             options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
                     container_width,
                     container_height);
@@ -79,13 +83,23 @@ public class MyProfileActivity extends BaseActivity {
         }
 
         @Override
+        protected void onCancelled() {
+
+            super.onCancelled();
+            this.running = false;
+        }
+
+        @Override
         protected void onPostExecute(Bitmap aVoid) {
-            Log.d("changing image", total_loaded_images+"");
-            ImageView temp = ((ImageView) ((PhotosPagerFragment) mFragmentManager.findFragmentByTag("PAGER"))
-                    .getViewPager().findViewWithTag("POSITION" + total_loaded_images));
-            if(temp!=null)
-                temp.setImageBitmap(aVoid);
-            total_loaded_images++;
+            if(!this.isCancelled() && running) {
+                Log.d("changing image", total_loaded_images + "");
+
+                ImageView temp = ((ImageView) ((PhotosPagerFragment) mFragmentManager.findFragmentByTag("PAGER"))
+                        .getViewPager().findViewWithTag("POSITION" + total_loaded_images));
+                if (temp != null)
+                    temp.setImageBitmap(aVoid);
+                total_loaded_images++;
+            }
         }
     }
 
@@ -103,6 +117,7 @@ public class MyProfileActivity extends BaseActivity {
     }
 
 
+
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         container_height = findViewById(R.id.top_container).getMeasuredHeight();
@@ -118,7 +133,7 @@ public class MyProfileActivity extends BaseActivity {
 
         mFragmentManager = getSupportFragmentManager();
         mFragment = mFragmentManager.findFragmentById(R.id.top_container);
-
+        referenceKeeper = new ArrayList<>();
         initialize();
         bindView();
 
@@ -126,7 +141,7 @@ public class MyProfileActivity extends BaseActivity {
 
         String email = (String)getIntent().getSerializableExtra(EXTRA_USER_EMAIL);
 
-        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos?email="+email, null,
+        imageRequest = new JsonObjectRequest(Request.Method.GET, getString(R.string.laravel_API_url) + "photos?email="+email, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -139,8 +154,9 @@ public class MyProfileActivity extends BaseActivity {
                             for (int i = 0; i < photos.length(); i++){
 
                                 Log.d("dapet image", photos.getJSONObject(i).getString("id"));
-
-                                new GetImages().execute(photos.getJSONObject(i).getString("photo"),photos.getJSONObject(i).getString("id"));
+                                GetImages baru = new GetImages();
+                                baru.execute(photos.getJSONObject(i).getString("photo"), photos.getJSONObject(i).getString("id"));
+                                referenceKeeper.add(baru);
                             }
 
 
@@ -162,7 +178,8 @@ public class MyProfileActivity extends BaseActivity {
                 return map;
             }
         };
-        q.add(r);
+        q.add(imageRequest);
+
         //fetch foto done
 
         PhotosPagerFragment temp = PhotosPagerFragment.createInstance();
@@ -187,7 +204,13 @@ public class MyProfileActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d("MyProfileAct", "MyProfileAct destroyed");
         photoList.clear();
+        for (int i = 0; i < referenceKeeper.size(); ++i){
+            Log.d("MyProfileAct", "destroying reference of getimages" + i);
+            referenceKeeper.get(i).cancel(true);
+        }
+        imageRequest.cancel();
         super.onDestroy();
     }
 
@@ -354,7 +377,11 @@ public class MyProfileActivity extends BaseActivity {
         }
     }
 
-
+    @Override
+    public void onBackPressed() {
+        mFragmentManager.popBackStack();
+        super.onBackPressed();
+    }
     private void savePhoto(final Bitmap bitmap){
         RequestQueue qUploadFoto = Volley.newRequestQueue(this);
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
@@ -407,5 +434,7 @@ public class MyProfileActivity extends BaseActivity {
         };
         qUploadFoto.add(request);
     }
+
+
 }
 
