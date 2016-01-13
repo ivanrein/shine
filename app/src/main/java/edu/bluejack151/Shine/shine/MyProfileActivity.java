@@ -24,12 +24,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,20 +65,23 @@ public class MyProfileActivity extends BaseActivity {
         @Override
         protected Bitmap doInBackground(String... params) {
 
+            Log.d("size stringnya", params[0].length() + "");
+
             byte[] decodedString = null;
             decodedString = Base64.decode(params[0], Base64.DEFAULT);
 
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-
+            final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            Log.d("image log", "decode pertama");
             options.inSampleSize = ImageProcessingHelper.calculateInSampleSize(options,
                     container_width,
                     container_height);
             options.inJustDecodeBounds = false;
             Log.d("processing image", "processing image" + total_loaded_images);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            Log.d("image log", "decode kedua");
             photoList.add(new Photo(params[1]));
             photoList.get(photoList.size()-1).setBitmap(bitmap);
             return bitmap;
@@ -344,7 +349,7 @@ public class MyProfileActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("Image", "" + requestCode + " " + resultCode);
         Log.d("Image", "" + EditPhotosFragment.GET_PHOTO + " " + RESULT_OK);
-        if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK && requestCode == EditPhotosFragment.GET_PHOTO) {
             if (data == null) {
                 return;
             }
@@ -383,6 +388,7 @@ public class MyProfileActivity extends BaseActivity {
         super.onBackPressed();
     }
     private void savePhoto(final Bitmap bitmap){
+        Log.d("MyProfileAct", "Uploading photo");
         RequestQueue qUploadFoto = Volley.newRequestQueue(this);
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteOutput);
@@ -404,10 +410,13 @@ public class MyProfileActivity extends BaseActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             if(response.getString("result").equals("success")) {
+                                Log.d("MyProfileAct", "Upload foto selesai");
                                 Toast.makeText(MyProfileActivity.this,
                                         "Photo successfully uploaded", Toast.LENGTH_SHORT).show();
-                                new_photo_id = response.getString("photo");
-                                photoList.get(photoList.size()-1).setPhotoId(new_photo_id);
+                                if(photoList != null && photoList.size() != 0) {
+                                    new_photo_id = response.getString("photo");
+                                    photoList.get(photoList.size() - 1).setPhotoId(new_photo_id);
+                                }
                             }
                             else{
                                 Toast.makeText(MyProfileActivity.this,
@@ -432,6 +441,7 @@ public class MyProfileActivity extends BaseActivity {
                 return params;
             }
         };
+        request.setRetryPolicy(new DefaultRetryPolicy(300000, 1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         qUploadFoto.add(request);
     }
 

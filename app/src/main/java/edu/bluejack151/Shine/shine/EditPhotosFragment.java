@@ -105,9 +105,10 @@ public class EditPhotosFragment extends Fragment {
                     int position = mPhotoHolder.indexOf((ImageView) v);
                     if (mPhotoHolder.get(position).getTag().equals(EMPTY))
                     {
+                        Log.d("editPhFrag", "getting user photo from gallery");
                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                         intent.setType("image/*");
-                        startActivityForResult(intent, GET_PHOTO);
+                        getActivity().startActivityForResult(intent, GET_PHOTO);
                     }
                 }
             });

@@ -337,8 +337,8 @@ public class HomeActivity extends BaseActivity {
             }
         });
 
-        mNavbarItems.add(new NavItem("MyProfile", "Set your profile setting and more", R.drawable.com_facebook_button_icon));
-        mNavbarItems.add(new NavItem("Top School", "Most popular school", R.drawable.com_facebook_button_icon));
+        mNavbarItems.add(new NavItem("Home", "Vote for users in your area!", R.drawable.com_facebook_button_icon));
+        mNavbarItems.add(new NavItem("Top School", "View which schools hit the board!", R.drawable.com_facebook_button_icon));
         mNavbarItems.add(new NavItem("Logout", "Logout from Shine", R.drawable.com_facebook_button_icon));
 
         mNavbarLayout.setDrawerListener(mActionBarDrawerToggle);
@@ -348,6 +348,12 @@ public class HomeActivity extends BaseActivity {
     public void selectMenu(int position) {
         //start intent from the nav bar here broh
         Toast.makeText(HomeActivity.this, mNavbarItems.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+        if(position == 0){ // ke Home
+            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+            startActivity(i);
+            finish();
+        }
+
         if (position == 1) { // ke SchoolList
             SchoolListFragment fragment = SchoolListFragment.createFragment(HomeActivity.this);
             mFragmentManager.beginTransaction()
